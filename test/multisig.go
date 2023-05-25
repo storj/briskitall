@@ -59,13 +59,13 @@ func (h *MultiSigHarness) SubmitAddOwner(t *testing.T, initiator *ecdsa.PrivateK
 }
 
 func (h *MultiSigHarness) SubmitApprove(t *testing.T, initiator *ecdsa.PrivateKey, spender common.Address, amount string) uint64 {
-	transactionID, err := h.newTransactor(t, initiator).SubmitApprove(context.Background(), h.tokenContractAddress, spender, bigString(t, amount))
+	transactionID, err := h.newTransactor(t, initiator).SubmitTokenApprove(context.Background(), h.tokenContractAddress, spender, bigString(t, amount))
 	require.NoError(t, err)
 	return transactionID
 }
 
 func (h *MultiSigHarness) SubmitTransfer(t *testing.T, initiator *ecdsa.PrivateKey, recipient common.Address, amount string) uint64 {
-	transactionID, err := h.newTransactor(t, initiator).SubmitTransfer(context.Background(), h.tokenContractAddress, recipient, bigString(t, amount))
+	transactionID, err := h.newTransactor(t, initiator).SubmitTokenTransfer(context.Background(), h.tokenContractAddress, recipient, bigString(t, amount))
 	require.NoError(t, err)
 	return transactionID
 }

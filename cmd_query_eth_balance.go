@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/shopspring/decimal"
 	"github.com/zeebo/clingy"
+	"storj.io/briskitall/internal/eth"
 )
 
 type cmdQueryETHBalance struct {
@@ -38,18 +37,6 @@ func (cmd *cmdQueryETHBalance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Fprintln(clingy.Stdout(ctx), prettyETH(balance))
+	fmt.Fprintln(clingy.Stdout(ctx), eth.Pretty(balance))
 	return nil
-}
-
-// prettyETH is lovingly borrowed from storj/crypto-batch-payment
-func prettyETH(wei *big.Int) string {
-	switch {
-	case wei.Cmp(big.NewInt(1_000_000_000_000_000)) > 0:
-		return fmt.Sprintf("%s ETH", decimal.NewFromBigInt(wei, -18))
-	case wei.Cmp(big.NewInt(1_000_000_0)) > 0:
-		return fmt.Sprintf("%s GWei", decimal.NewFromBigInt(wei, -9))
-	default:
-		return fmt.Sprintf("%s Wei", wei)
-	}
 }

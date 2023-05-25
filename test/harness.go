@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 
 	"storj.io/briskitall/internal/multisig"
@@ -16,7 +15,7 @@ func Run(t *testing.T) *Harness {
 	geth := runGeth(t)
 
 	// Fund the accounts that will issue transactions with ETH
-	geth.Fund(t, append([]common.Address{rootAddress}, AccountAddress...)...)
+	geth.Fund(t, rootAddress, AccountAddress[0], AccountAddress[1], AccountAddress[2])
 
 	multiSigContractAddress := deployMultiSigContract(t, geth.RootTransactor, geth.Client)
 	tokenContractAddress := deployTokenContract(t, geth.RootTransactor, geth.Client, multiSigContractAddress)
@@ -30,9 +29,14 @@ func Run(t *testing.T) *Harness {
 	tokenCaller, err := token.NewCaller(geth.Client, tokenContractAddress)
 	require.NoError(t, err)
 
+	geth.Fund(t, multiSigContractAddress)
+
 	return &Harness{
 		ChainID: geth.ChainID,
 		NodeURL: geth.NodeURL,
+		ETH: ETHHarness{
+			client: geth.Client,
+		},
 		MultiSig: MultiSigHarness{
 			ContractAddress:      multiSigContractAddress,
 			Caller:               multiSigCaller,
@@ -53,6 +57,7 @@ func Run(t *testing.T) *Harness {
 type Harness struct {
 	NodeURL  string
 	ChainID  *big.Int
+	ETH      ETHHarness
 	MultiSig MultiSigHarness
 	Token    TokenHarness
 }

@@ -114,7 +114,11 @@ func (t *Transactor) SubmitChangeRequirement(ctx context.Context, requirement ui
 	return t.SubmitTransaction(ctx, t.multiSigAddress, zero, data)
 }
 
-func (t *Transactor) SubmitTransfer(ctx context.Context, tokenContractAddress, recipient common.Address, amount *big.Int) (uint64, error) {
+func (t *Transactor) SubmitETHTransfer(ctx context.Context, recipient common.Address, amount *big.Int) (uint64, error) {
+	return t.SubmitTransaction(ctx, recipient, amount, nil)
+}
+
+func (t *Transactor) SubmitTokenTransfer(ctx context.Context, tokenContractAddress, recipient common.Address, amount *big.Int) (uint64, error) {
 	data, err := erc20ABI.Pack("transfer", recipient, amount)
 	if err != nil {
 		return 0, err
@@ -123,7 +127,7 @@ func (t *Transactor) SubmitTransfer(ctx context.Context, tokenContractAddress, r
 	return t.SubmitTransaction(ctx, tokenContractAddress, zero, data)
 }
 
-func (t *Transactor) SubmitTransferFrom(ctx context.Context, tokenContractAddress, from, to common.Address, amount *big.Int) (uint64, error) {
+func (t *Transactor) SubmitTokenTransferFrom(ctx context.Context, tokenContractAddress, from, to common.Address, amount *big.Int) (uint64, error) {
 	data, err := erc20ABI.Pack("transferFrom", from, to, amount)
 	if err != nil {
 		return 0, err
@@ -132,7 +136,7 @@ func (t *Transactor) SubmitTransferFrom(ctx context.Context, tokenContractAddres
 	return t.SubmitTransaction(ctx, tokenContractAddress, zero, data)
 }
 
-func (t *Transactor) SubmitApprove(ctx context.Context, tokenContractAddress, spender common.Address, amount *big.Int) (uint64, error) {
+func (t *Transactor) SubmitTokenApprove(ctx context.Context, tokenContractAddress, spender common.Address, amount *big.Int) (uint64, error) {
 	data, err := erc20ABI.Pack("approve", spender, amount)
 	if err != nil {
 		return 0, err
@@ -185,10 +189,10 @@ func (t *Transactor) RevokeConfirmation(ctx context.Context, transactionID uint6
 	return err
 }
 
-func (t *Transactor) SubmitTransaction(ctx context.Context, contractAddress common.Address, value *big.Int, data []byte) (uint64, error) {
+func (t *Transactor) SubmitTransaction(ctx context.Context, destination common.Address, value *big.Int, data []byte) (uint64, error) {
 	opts := t.transactOpts(ctx)
 
-	tx, err := t.transactor.SubmitTransaction(opts, contractAddress, value, data)
+	tx, err := t.transactor.SubmitTransaction(opts, destination, value, data)
 	if err != nil {
 		if isInvalidInput(err) {
 			return 0, errs.New("failed to submit transaction: invalid input: %v", err)

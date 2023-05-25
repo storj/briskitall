@@ -42,6 +42,9 @@ func commands(cmds clingy.Commands) {
 
 	cmds.Break()
 	cmds.Group("submit", "Submit transaction to the multisig contract", func() {
+		cmds.Group("eth", "Submit ETH transactions", func() {
+			cmds.New("transfer", "Submit a transaction to transfer ETH", new(cmdSubmitETHTransfer))
+		})
 		cmds.Group("multisig", "Submit multisig transactions", func() {
 			cmds.Group("requirement", "Submit requirement transactions", func() {
 				cmds.New("change", "Submit a transaction to change the confirmation requirement", new(cmdSubmitMultisigRequirementChange))

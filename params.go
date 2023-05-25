@@ -102,9 +102,15 @@ func transformAddress(s string) (common.Address, error) {
 }
 
 func transformBigInt(s string) (*big.Int, error) {
-	b, ok := new(big.Int).SetString(s, 0)
+	// use float so that we can accept scientific notation
+	f, ok := new(big.Float).SetString(s)
 	if !ok {
 		return nil, fmt.Errorf("not a valid big integer: %q", s)
 	}
-	return b, nil
+	i, a := f.Int(nil)
+	// make sure it there is no fractional component
+	if a != big.Exact {
+		return nil, fmt.Errorf("not a valid big integer: %q", s)
+	}
+	return i, nil
 }

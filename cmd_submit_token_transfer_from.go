@@ -30,7 +30,7 @@ func (cmd *cmdSubmitTokenTransferFrom) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	transactionID, err := transactor.SubmitTransferFrom(ctx, cmd.token.contractAddress, cmd.from, cmd.to, cmd.amount)
+	transactionID, err := transactor.SubmitTokenTransferFrom(ctx, cmd.token.contractAddress, cmd.from, cmd.to, cmd.amount)
 	if err != nil {
 		return err
 	}

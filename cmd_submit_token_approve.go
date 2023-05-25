@@ -28,7 +28,7 @@ func (cmd *cmdSubmitTokenApprove) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	transactionID, err := transactor.SubmitApprove(ctx, cmd.token.contractAddress, cmd.spender, cmd.amount)
+	transactionID, err := transactor.SubmitTokenApprove(ctx, cmd.token.contractAddress, cmd.spender, cmd.amount)
 	if err != nil {
 		return err
 	}
