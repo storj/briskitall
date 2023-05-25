@@ -34,7 +34,7 @@ Available commands:
     briskitall revoke                                Revoke confirmation on a pending transaction
     briskitall debug deploy multisig                 Deploys the MultiSigWalletWithDailyLimit contract
     briskitall debug deploy token                    Deploys the CentrallyIssuedToken contract
-...
+```
 
 ## Private Keys
 
