@@ -41,14 +41,18 @@ Available commands:
 Brisk-It-All can use private keys from the following:
 
 1. Private key files on disk (must be mode 0600):
+    ```
     briskitall some command --sender-key-file <path-to-key> ...
     or
     BRISTKITALL_SENDER_KEY_FILE=<path-to-key> briskitall some command ...
+    ```
 
 2. Via a clef-managed account:
+    ```
     briskitall some command --clef-endpoint <path-to-clef-socket> --sender=<sender-address>...
     or
     BRISKITALL_CLEF_ENDPOINT=<path-to-clef-socket> BRISKITALL_SENDER=<sender-address> briskitall some command ...
+    ```
 
 ## Risks
 
