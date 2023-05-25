@@ -33,6 +33,10 @@ func addressArg(params clingy.Parameters, name, desc string) common.Address {
 	return params.Arg(name, desc, clingy.Transform(transformAddress)).(common.Address)
 }
 
+func optAddressArg(params clingy.Parameters, name, desc string) *common.Address {
+	return params.Arg(name, desc, clingy.Optional, clingy.Transform(transformAddress)).(*common.Address)
+}
+
 func repeatedAddressArg(params clingy.Parameters, name, desc string) []common.Address {
 	return params.Arg(name, desc, clingy.Repeated, clingy.Transform(transformAddress)).([]common.Address)
 }

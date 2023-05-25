@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/ethereum/go-ethereum v1.11.6
+	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.0
 	github.com/zeebo/clingy v0.0.0-20230516154534-f5df6a2e645d
 	github.com/zeebo/errs v1.3.0

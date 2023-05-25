@@ -12,7 +12,7 @@ import (
 )
 
 type Caller struct {
-	caller *contract.UpgradeableTokenCaller
+	caller *contract.CentrallyIssuedTokenCaller
 }
 
 type CallerBackend interface {
@@ -20,7 +20,7 @@ type CallerBackend interface {
 }
 
 func NewCaller(backend CallerBackend, contractAddress common.Address) (*Caller, error) {
-	caller, err := contract.NewUpgradeableTokenCaller(contractAddress, backend)
+	caller, err := contract.NewCentrallyIssuedTokenCaller(contractAddress, backend)
 	if err != nil {
 		return nil, errs.Wrap(err)
 	}

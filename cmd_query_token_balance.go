@@ -23,10 +23,12 @@ func (cmd *cmdQueryTokenBalance) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	balance, err := caller.GetBalance(ctx, cmd.address)
 	if err != nil {
 		return err
 	}
+
 	fmt.Fprintln(clingy.Stdout(ctx), balance)
 	return nil
 }

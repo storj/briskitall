@@ -20,6 +20,9 @@ func main() {
 
 func commands(cmds clingy.Commands) {
 	cmds.Group("query", "Query commands", func() {
+		cmds.Group("eth", "Query ETH", func() {
+			cmds.New("balance", "Retrieves the ETH balance of an address", new(cmdQueryETHBalance))
+		})
 		cmds.Group("multisig", "Query the multisig contract", func() {
 			cmds.New("requirement", "Query the multisig contract confirmation requirement", new(cmdQueryMultiSigRequirement))
 			cmds.Group("owner", "Query multisig contract ownership", func() {
