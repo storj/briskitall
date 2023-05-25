@@ -1,11 +1,11 @@
 package main
 
 const (
-	envNodeURL                 = "BRISK_IT_ALL_NODE_URL"
-	envMultiSigContractAddress = "BRISK_IT_ALL_MULTISIG_CONTRACT_ADDRESS"
-	envTokenContractAddress    = "BRISK_IT_ALL_TOKEN_CONTRACT_ADDRESS"
-	envChainID                 = "BRISK_IT_ALL_CHAINID"
-	envSender                  = "BRISK_IT_ALL_SENDER"
-	envSenderKeyFile           = "BRISK_IT_ALL_SENDER_KEY_FILE"
-	envClefEndpoint            = "BRISK_IT_ALL_CLEF_ENDPOINT"
+	envNodeURL                 = "BRISKITALL_NODE_URL"
+	envMultiSigContractAddress = "BRISKITALL_MULTISIG_CONTRACT_ADDRESS"
+	envTokenContractAddress    = "BRISKITALL_TOKEN_CONTRACT_ADDRESS"
+	envChainID                 = "BRISKITALL_CHAINID"
+	envSender                  = "BRISKITALL_SENDER"
+	envSenderKeyFile           = "BRISKITALL_SENDER_KEY_FILE"
+	envClefEndpoint            = "BRISKITALL_CLEF_ENDPOINT"
 )

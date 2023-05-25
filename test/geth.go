@@ -62,7 +62,7 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 // runGeth starts geth in a docker container with a random ID. The geth RPC port
 // is bound to an ephemeral port on the host.
 func runGeth(t *testing.T) *geth {
-	containerName := os.Getenv("BRISK_IT_ALL_TEST_CONTAINER")
+	containerName := os.Getenv("BRISKITALL_TEST_CONTAINER")
 	if containerName == "" {
 		containerName = fmt.Sprintf("geth-test-%d", rand.Uint64())
 
