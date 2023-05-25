@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -15,7 +16,14 @@ func main() {
 	env := clingy.Environment{
 		Name: "briskitall",
 	}
-	env.Run(ctx, commands)
+	ok, err := env.Run(ctx, commands)
+	switch {
+	case err != nil:
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(2)
+	case !ok:
+		os.Exit(1)
+	}
 }
 
 func commands(cmds clingy.Commands) {
