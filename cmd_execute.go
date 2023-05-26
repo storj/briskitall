@@ -22,9 +22,11 @@ func (cmd *cmdExecute) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	if err := transactor.ExecuteTransaction(ctx, cmd.transactionID); err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d executed by %s\n", cmd.transactionID, transactor.Sender())
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, cmd.transactionID)
 }

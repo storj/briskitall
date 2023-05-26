@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,78 +9,61 @@ import (
 )
 
 func TestQueryMultiSigTransactionListCmd(t *testing.T) {
+	const expectedPending = `Transaction 0:
+  Destination = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
+  Call        = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
+  Executed    = false
+  Confirmed   = false
+  Confirmations(1):
+    - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+  Events(2):
+    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
+`
+	const expectedExecuted = `Transaction 0:
+  Destination = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
+  Call        = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
+  Executed    = true
+  Confirmed   = true
+  Confirmations(2):
+    - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - Owner(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
+  Events(4):
+    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
+    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
+    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Execution()
+`
+
 	harness := test.Run(t)
 
 	// Submit the transaction and assert that it shows up under pending.
 	transactionID := harness.MultiSig.SubmitAddOwner(t, test.AccountKey[0], test.AccountAddress[2])
 
-	stdout := requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		"--pending=false", "--executed=false")
-	assert.Empty(t, stdout)
+	assert.Empty(t, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=false", "--executed=false"))
 
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		"--pending=false", "--executed=true")
-	assert.Empty(t, stdout)
+	assert.Empty(t, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=false", "--executed=true"))
 
-	// pending with no status
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		"--pending=true", "--executed=false")
-	assert.Equal(t, "0\n", stdout)
+	assert.Equal(t, "0\n", requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=true", "--executed=false"))
 
-	// pending with status
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		// FLAGS
-		"--pending=true", "--executed=false", "--status")
-	assert.Equal(t, fmt.Sprintf(`Transaction %d:
-  Destination    = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
-  Value          = 0
-  Data (raw)     = 7065cb48000000000000000000000000d370bbc286487cd41e18c3561c0fc9c1a986516b
-  Data (decoded) = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
-  Executed       = false
-  Confirmed      = false
-  Confirmations(1):
-    - 0x46f40B6B0dFDa35A8b6247489669a83c69804F3a
-  Events(2):
-    - Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a,0)
-    - Submission(0)
-`, transactionID), stdout)
+	assert.Equal(t, expectedPending, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=true", "--executed=false", "--status"))
 
 	// Now confirm the transaction and assert that it shows up under executed.
 	harness.MultiSig.ConfirmTransaction(t, test.AccountKey[1], transactionID)
 
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		// FLAGS
-		"--pending=false", "--executed=false")
-	assert.Empty(t, stdout)
+	assert.Empty(t, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=false", "--executed=false"))
 
-	// executed with no status
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		"--pending=false", "--executed=true")
-	assert.Equal(t, "0\n", stdout)
+	assert.Empty(t, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=true", "--executed=false"))
 
-	// executed with status
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		// FLAGS
-		"--pending=false", "--executed=true", "--status")
-	assert.Equal(t, fmt.Sprintf(`Transaction %d:
-  Destination    = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
-  Value          = 0
-  Data (raw)     = 7065cb48000000000000000000000000d370bbc286487cd41e18c3561c0fc9c1a986516b
-  Data (decoded) = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
-  Executed       = true
-  Confirmed      = true
-  Confirmations(2):
-    - 0x46f40B6B0dFDa35A8b6247489669a83c69804F3a
-    - 0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0
-  Events(4):
-    - Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a,0)
-    - Submission(0)
-    - Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0,0)
-    - Execution(0)
-`, transactionID), stdout)
+	assert.Equal(t, "0\n", requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=false", "--executed=true"))
 
-	stdout = requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
-		// FLAGS
-		"--pending=true", "--executed=false")
-	assert.Empty(t, stdout)
+	assert.Equal(t, expectedExecuted, requireCmdSuccess(t, harness, "query", "multisig", "transaction", "list",
+		"--pending=false", "--executed=true", "--status"))
 }

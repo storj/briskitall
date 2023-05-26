@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	invalidInputErrorCode = -32000
+	executionRevertedErrorCode = -32000
 )
 
 var (
@@ -86,9 +86,9 @@ func findTransaction(ctx context.Context, caller *contract.MultiSigWalletWithDai
 	}, nil
 }
 
-func isInvalidInput(err error) bool {
+func isExecutionReverted(err error) bool {
 	if ec, ok := err.(interface{ ErrorCode() int }); ok {
-		return ec.ErrorCode() == invalidInputErrorCode
+		return ec.ErrorCode() == executionRevertedErrorCode
 	}
 	return false
 }

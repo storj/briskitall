@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"fmt"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/zeebo/clingy"
+
 	"storj.io/briskitall/internal/contract"
 	"storj.io/briskitall/internal/multisig"
 )
@@ -66,27 +66,23 @@ func printTransactionStatus(ctx context.Context, caller *multisig.Caller, transa
 		return err
 	}
 
-	dataRaw := "<empty>"
-	dataDecoded := "<empty>"
-
-	if len(tx.Data) > 0 {
-		dataRaw = hex.EncodeToString(tx.Data)
-		dataDecoded = tryDecodeCall(tx.Data)
-		if dataDecoded == "" {
-			dataDecoded = "<unable to decode>"
-		}
-	}
+	call := tryDecodeCall(tx.Data)
 
 	fmt.Fprintf(out, "Transaction %d:\n", transactionID)
-	fmt.Fprintf(out, "  Destination    = %s\n", tx.Destination)
-	fmt.Fprintf(out, "  Value          = %s\n", tx.Value)
-	fmt.Fprintf(out, "  Data (raw)     = %s\n", dataRaw)
-	fmt.Fprintf(out, "  Data (decoded) = %s\n", dataDecoded)
-	fmt.Fprintf(out, "  Executed       = %t\n", tx.Executed)
-	fmt.Fprintf(out, "  Confirmed      = %t\n", confirmed)
+	fmt.Fprintf(out, "  Destination = %s\n", tx.Destination)
+	switch {
+	case len(tx.Data) == 0:
+		fmt.Fprintf(out, "  Value       = %s\n", tx.Value)
+	case call != "":
+		fmt.Fprintf(out, "  Call        = %s\n", call)
+	default:
+		fmt.Fprintf(out, "  Data (raw)  = %x\n", tx.Data)
+	}
+	fmt.Fprintf(out, "  Executed    = %t\n", tx.Executed)
+	fmt.Fprintf(out, "  Confirmed   = %t\n", confirmed)
 	fmt.Fprintf(out, "  Confirmations(%d):\n", len(confirmations))
 	for _, confirmation := range confirmations {
-		fmt.Fprintf(out, "    - %s\n", confirmation)
+		fmt.Fprintf(out, "    - Owner(%s)\n", confirmation)
 	}
 	fmt.Fprintf(out, "  Events(%d):\n", len(events))
 	for _, event := range events {
@@ -125,6 +121,14 @@ func tryDecodeABICall(abi *abi.ABI, data []byte) string {
 		for i, arg := range args {
 			if i > 0 {
 				buf.WriteString(", ")
+			}
+			if argData, ok := arg.([]byte); ok {
+				if argCall := tryDecodeCall(argData); argCall != "" {
+					fmt.Fprint(buf, argCall)
+				} else {
+					fmt.Fprintf(buf, "%x", arg)
+				}
+				continue
 			}
 			fmt.Fprint(buf, arg)
 		}

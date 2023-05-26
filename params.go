@@ -49,6 +49,10 @@ func boolFlag(params clingy.Parameters, name, desc string) bool {
 	return params.Flag(name, desc, false, clingy.Transform(strconv.ParseBool), clingy.Boolean).(bool)
 }
 
+func boolEnvFlag(params clingy.Parameters, name, desc, env string) bool {
+	return params.Flag(name, desc, false, clingy.Getenv(env), clingy.Transform(strconv.ParseBool), clingy.Boolean).(bool)
+}
+
 func stringFlag(params clingy.Parameters, name, desc, def string) string {
 	return params.Flag(name, desc, def).(string)
 }

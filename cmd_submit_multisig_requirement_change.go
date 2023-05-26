@@ -26,6 +26,7 @@ func (cmd *cmdSubmitMultisigRequirementChange) Execute(ctx context.Context) erro
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to change confirmation requirement to %d\n", transactionID, cmd.requirement)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }

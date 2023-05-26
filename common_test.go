@@ -44,6 +44,8 @@ func runCmd(t *testing.T, harness *test.Harness, rawArgs ...interface{}) (*bytes
 				return harness.MultiSig.ContractAddress.String()
 			case envTokenContractAddress:
 				return harness.Token.ContractAddress.String()
+			case envSkipConfirmation:
+				return "true"
 			}
 			return ""
 		},

@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeebo/errs"
 
 	"storj.io/briskitall/internal/contract"
@@ -17,7 +16,12 @@ type Caller struct {
 	filterer *contract.MultiSigWalletWithDailyLimitFilterer
 }
 
-func NewCaller(backend *ethclient.Client, contractAddress common.Address) (*Caller, error) {
+type CallerBackend interface {
+	bind.ContractCaller
+	bind.ContractFilterer
+}
+
+func NewCaller(backend CallerBackend, contractAddress common.Address) (*Caller, error) {
 	caller, err := contract.NewMultiSigWalletWithDailyLimitCaller(contractAddress, backend)
 	if err != nil {
 		return nil, errs.Wrap(err)
@@ -49,7 +53,7 @@ func (c *Caller) ListOwners(ctx context.Context) ([]common.Address, error) {
 	for index.Cmp(maxOwnerCount) != 0 {
 		owner, err := c.caller.Owners(opts, index)
 		if err != nil {
-			if isInvalidInput(err) {
+			if isExecutionReverted(err) {
 				return owners, nil
 			}
 			return nil, errs.New("failed to get owner %d: %v", index, err)

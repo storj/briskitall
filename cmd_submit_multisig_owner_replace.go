@@ -29,6 +29,7 @@ func (cmd *cmdSubmitMultisigOwnerReplace) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to replace owner %s with %s\n", transactionID, cmd.oldOwner, cmd.newOwner)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }

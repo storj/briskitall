@@ -13,22 +13,20 @@ import (
 
 type WaitProgress interface {
 	Start(hash common.Hash)
-	Tick()
-	Canceled(err error)
+	Canceled()
 	Failed(status uint64)
 	Dropped()
-	Success()
+	Confirmed()
 	TempError(err error)
 }
 
 type NoProgress struct{}
 
 func (NoProgress) Start(hash common.Hash) {}
-func (NoProgress) Tick()                  {}
-func (NoProgress) Canceled(err error)     {}
+func (NoProgress) Canceled()              {}
 func (NoProgress) Failed(status uint64)   {}
 func (NoProgress) Dropped()               {}
-func (NoProgress) Success()               {}
+func (NoProgress) Confirmed()             {}
 func (NoProgress) TempError(err error)    {}
 
 type WaitBackend interface {
@@ -73,14 +71,11 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 		progress = NoProgress{}
 	}
 	progress.Start(hash)
-	for attempts := 0; ; attempts++ {
-		if attempts%10 == 0 {
-			progress.Tick()
-		}
+	for {
 		select {
 		case <-time.After(time.Millisecond * 100):
 		case <-ctx.Done():
-			progress.Canceled(ctx.Err())
+			progress.Canceled()
 			return 0, ctx.Err()
 		}
 
@@ -88,8 +83,9 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 		switch {
 		case err == nil:
 			if receipt.Status == types.ReceiptStatusSuccessful {
-				progress.Success()
-				return receipt.BlockNumber.Uint64(), nil
+				blockNumber := receipt.BlockNumber.Uint64()
+				progress.Confirmed()
+				return blockNumber, nil
 			}
 			progress.Failed(receipt.Status)
 			return 0, errors.New("transaction failed")

@@ -19,8 +19,8 @@ type waitProgress struct {
 
 func (w *waitProgress) Start(hash common.Hash) { w.hash = hash }
 func (w *waitProgress) Tick()                  { w.t.Logf("%s: waiting...", w.hash) }
-func (w *waitProgress) Canceled(err error)     { w.t.Logf("%s: wait canceled: %v", w.hash, err) }
-func (w *waitProgress) Failed(status uint64)   { w.t.Logf("%s: failed: status=%d", w.hash, status) }
+func (w *waitProgress) Canceled()              { w.t.Logf("%s: wait canceled", w.hash) }
+func (w *waitProgress) Failed(status uint64)   { w.t.Logf("%s: failed(%d)", w.hash, status) }
 func (w *waitProgress) Dropped()               { w.t.Logf("%s: dropped", w.hash) }
-func (w *waitProgress) Success()               { w.t.Logf("%s: success", w.hash) }
+func (w *waitProgress) Confirmed()             { w.t.Logf("%s: confirmed", w.hash) }
 func (w *waitProgress) TempError(err error)    { w.t.Logf("%s: temp error: %v", w.hash, err) }

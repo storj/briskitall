@@ -7,7 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
-	"storj.io/briskitall/internal/eth"
 )
 
 type cmdSubmitETHTransfer struct {
@@ -31,6 +30,7 @@ func (cmd *cmdSubmitETHTransfer) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to transfer %s to %s\n", transactionID, eth.Pretty(cmd.amount), cmd.recipient)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }

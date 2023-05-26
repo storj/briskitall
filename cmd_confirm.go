@@ -22,9 +22,12 @@ func (cmd *cmdConfirm) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	if _, err := transactor.ConfirmTransaction(ctx, cmd.transactionID); err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d confirmed by %s\n", cmd.transactionID, transactor.Sender())
+
+	fmt.Fprintln(clingy.Stdout(ctx))
+	printTransactionStatus(ctx, transactor.Caller, cmd.transactionID)
 	return nil
 }

@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"storj.io/briskitall/test"
 )
@@ -24,16 +21,9 @@ func TestSubmitTokenTransferFromCmd(t *testing.T) {
 	transferFromID := transferID + 1
 
 	// Submits the transferFrom for amount from account 2 to account 3
-	stdout := requireCmdSuccess(t, harness, "submit", "token", "transfer-from",
+	requireCmdSuccess(t, harness, "submit", "token", "transfer-from",
 		test.AccountAddress[2], test.AccountAddress[3], amount,
 		"--sender-key-file", test.AccountKeyFile[0],
-	)
-	assert.Contains(t, stdout,
-		fmt.Sprintf("Transaction %d submitted to transfer 100000000 from %s to %s",
-			transferFromID,
-			test.AccountAddress[2],
-			test.AccountAddress[3],
-		),
 	)
 
 	harness.Token.AssertBalance(t, harness.MultiSig.ContractAddress, "99900000000")

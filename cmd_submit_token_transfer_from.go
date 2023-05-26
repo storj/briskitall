@@ -34,6 +34,7 @@ func (cmd *cmdSubmitTokenTransferFrom) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to transfer %s from %s to %s\n", transactionID, cmd.amount, cmd.from, cmd.to)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }

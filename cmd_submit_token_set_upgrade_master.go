@@ -29,6 +29,7 @@ func (cmd *cmdSubmitTokenSetUpgradeMaster) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to set the upgrade master to %s\n", transactionID, cmd.master)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }

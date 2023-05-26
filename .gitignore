@@ -1,2 +1,5 @@
 # The application binary
-/brisk-it-all
+/briskitall
+
+# Test environment
+/.test.env

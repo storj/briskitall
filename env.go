@@ -8,4 +8,5 @@ const (
 	envSender                  = "BRISKITALL_SENDER"
 	envSenderKeyFile           = "BRISKITALL_SENDER_KEY_FILE"
 	envClefEndpoint            = "BRISKITALL_CLEF_ENDPOINT"
+	envSkipConfirmation        = "BRISKITALL_SKIP_CONFIRMATION"
 )

@@ -19,7 +19,7 @@ func main() {
 	ok, err := env.Run(ctx, commands)
 	switch {
 	case err != nil:
-		fmt.Fprintln(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, "Error:", err.Error())
 		os.Exit(2)
 	case !ok:
 		os.Exit(1)

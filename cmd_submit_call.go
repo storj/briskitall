@@ -49,11 +49,13 @@ func (cmd *cmdSubmitContractCall) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	transactionID, err := transactor.SubmitTransaction(ctx, cmd.address, cmd.value, data)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(clingy.Stdout(ctx), "Transaction %d submitted to call %s/%s\n", transactionID, cmd.address, cmd.function)
+
+	fmt.Fprintln(clingy.Stdout(ctx))
 	return printTransactionStatus(ctx, transactor.Caller, transactionID)
 }
 

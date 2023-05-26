@@ -6,50 +6,55 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeebo/errs"
 
 	"storj.io/briskitall/internal/contract"
 	"storj.io/briskitall/internal/eth"
 )
 
+type Confirmer = func(ctx context.Context, from, destination common.Address, value *big.Int, data []byte) error
+
 type Transactor struct {
 	*Caller
-	backend         *ethclient.Client
 	transactor      *contract.MultiSigWalletWithDailyLimitTransactor
 	filterer        *contract.MultiSigWalletWithDailyLimitFilterer
-	multiSigAddress common.Address
+	contractAddress common.Address
 	senderAddress   common.Address
 	senderSigner    bind.SignerFn
 	waiter          eth.Waiter
 }
 
-func NewTransactor(backend *ethclient.Client, multiSigAddress, senderAddress common.Address, senderSigner bind.SignerFn, waiter eth.Waiter) (*Transactor, error) {
+type TransactorBackend interface {
+	CallerBackend
+	bind.ContractTransactor
+	eth.WaitBackend
+}
+
+func NewTransactor(backend TransactorBackend, contractAddress, senderAddress common.Address, senderSigner bind.SignerFn, waiter eth.Waiter) (*Transactor, error) {
 	if waiter == nil {
 		waiter = eth.SilentWaiter(backend)
 	}
 
-	caller, err := NewCaller(backend, multiSigAddress)
+	caller, err := NewCaller(backend, contractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	transactor, err := contract.NewMultiSigWalletWithDailyLimitTransactor(multiSigAddress, backend)
+	transactor, err := contract.NewMultiSigWalletWithDailyLimitTransactor(contractAddress, backend)
 	if err != nil {
 		return nil, errs.Wrap(err)
 	}
 
-	filterer, err := contract.NewMultiSigWalletWithDailyLimitFilterer(multiSigAddress, backend)
+	filterer, err := contract.NewMultiSigWalletWithDailyLimitFilterer(contractAddress, backend)
 	if err != nil {
 		return nil, errs.Wrap(err)
 	}
 
 	return &Transactor{
 		Caller:          caller,
-		backend:         backend,
 		transactor:      transactor,
 		filterer:        filterer,
-		multiSigAddress: multiSigAddress,
+		contractAddress: contractAddress,
 		senderAddress:   senderAddress,
 		senderSigner:    senderSigner,
 		waiter:          waiter,
@@ -70,7 +75,7 @@ func (t *Transactor) SubmitAddOwner(ctx context.Context, owner common.Address) (
 		return 0, err
 	}
 
-	return t.SubmitTransaction(ctx, t.multiSigAddress, zero, data)
+	return t.SubmitTransaction(ctx, t.contractAddress, zero, data)
 }
 
 func (t *Transactor) SubmitRemoveOwner(ctx context.Context, owner common.Address) (uint64, error) {
@@ -83,7 +88,7 @@ func (t *Transactor) SubmitRemoveOwner(ctx context.Context, owner common.Address
 		return 0, err
 	}
 
-	return t.SubmitTransaction(ctx, t.multiSigAddress, zero, data)
+	return t.SubmitTransaction(ctx, t.contractAddress, zero, data)
 }
 
 func (t *Transactor) SubmitReplaceOwner(ctx context.Context, oldOwner, newOwner common.Address) (uint64, error) {
@@ -99,7 +104,7 @@ func (t *Transactor) SubmitReplaceOwner(ctx context.Context, oldOwner, newOwner 
 		return 0, err
 	}
 
-	return t.SubmitTransaction(ctx, t.multiSigAddress, zero, data)
+	return t.SubmitTransaction(ctx, t.contractAddress, zero, data)
 }
 
 func (t *Transactor) SubmitChangeRequirement(ctx context.Context, requirement uint64) (uint64, error) {
@@ -111,7 +116,7 @@ func (t *Transactor) SubmitChangeRequirement(ctx context.Context, requirement ui
 		return 0, err
 	}
 
-	return t.SubmitTransaction(ctx, t.multiSigAddress, zero, data)
+	return t.SubmitTransaction(ctx, t.contractAddress, zero, data)
 }
 
 func (t *Transactor) SubmitETHTransfer(ctx context.Context, recipient common.Address, amount *big.Int) (uint64, error) {
@@ -159,10 +164,10 @@ func (t *Transactor) ConfirmTransaction(ctx context.Context, transactionID uint6
 
 	tx, err := t.transactor.ConfirmTransaction(opts, newUint64(transactionID))
 	if err != nil {
-		if isInvalidInput(err) {
-			return 0, errs.New("failed to confirm transaction %d: %v: is the caller an owner?", transactionID, err)
+		if !isExecutionReverted(err) {
+			return 0, errs.New("failed to confirm transaction: %v", err)
 		}
-		return 0, errs.New("failed to confirm transaction: %v", err)
+		return 0, errs.New("failed to confirm transaction %d: %v: is the caller an owner?", transactionID, err)
 	}
 	return t.waiter.Wait(ctx, tx.Hash())
 }
@@ -194,7 +199,7 @@ func (t *Transactor) SubmitTransaction(ctx context.Context, destination common.A
 
 	tx, err := t.transactor.SubmitTransaction(opts, destination, value, data)
 	if err != nil {
-		if isInvalidInput(err) {
+		if isExecutionReverted(err) {
 			return 0, errs.New("failed to submit transaction: invalid input: %v", err)
 		}
 		return 0, errs.New("failed to submit transaction: %v", err)
