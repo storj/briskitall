@@ -8,10 +8,10 @@ import (
 	"storj.io/briskitall/test"
 )
 
-func TestDebugDeployTokenCmd(t *testing.T) {
+func TestTestDeployTokenCmd(t *testing.T) {
 	harness := test.Run(t)
 
-	stdout := requireCmdSuccess(t, harness, "debug", "deploy", "token",
+	stdout := requireCmdSuccess(t, harness, "test", "deploy", "token",
 		test.AccountAddress[2],
 		"--sender-key-file", test.AccountKeyFile[0],
 	)

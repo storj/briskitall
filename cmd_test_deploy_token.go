@@ -10,7 +10,7 @@ import (
 	"storj.io/briskitall/internal/token"
 )
 
-type cmdDebugDeployToken struct {
+type cmdTestDeployToken struct {
 	client      depClient
 	sender      depSender
 	owner       common.Address
@@ -20,7 +20,7 @@ type cmdDebugDeployToken struct {
 	decimals    int64
 }
 
-func (cmd *cmdDebugDeployToken) Setup(params clingy.Parameters) {
+func (cmd *cmdTestDeployToken) Setup(params clingy.Parameters) {
 	cmd.client.setup(params)
 	cmd.sender.setup(params)
 	cmd.name = stringFlag(params, "name", "Name of the token", "STORJ Token")
@@ -30,7 +30,7 @@ func (cmd *cmdDebugDeployToken) Setup(params clingy.Parameters) {
 	cmd.owner = addressArg(params, "OWNER", "Address of the contract owner")
 }
 
-func (cmd *cmdDebugDeployToken) Execute(ctx context.Context) error {
+func (cmd *cmdTestDeployToken) Execute(ctx context.Context) error {
 	client, err := cmd.client.open(ctx)
 	if err != nil {
 		return err

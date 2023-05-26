@@ -78,8 +78,8 @@ func commands(cmds clingy.Commands) {
 	cmds.Break()
 	cmds.Group("test", "Run test dommands", func() {
 		cmds.Group("deploy", "Submit transaction to the multisig contract", func() {
-			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdDebugDeployMultiSig))
-			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdDebugDeployToken))
+			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdTestDeployMultiSig))
+			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdTestDeployToken))
 		})
 	})
 }

@@ -10,7 +10,7 @@ import (
 	"storj.io/briskitall/internal/multisig"
 )
 
-type cmdDebugDeployMultiSig struct {
+type cmdTestDeployMultiSig struct {
 	client     depClient
 	sender     depSender
 	owners     []common.Address
@@ -18,7 +18,7 @@ type cmdDebugDeployMultiSig struct {
 	dailyLimit int64
 }
 
-func (cmd *cmdDebugDeployMultiSig) Setup(params clingy.Parameters) {
+func (cmd *cmdTestDeployMultiSig) Setup(params clingy.Parameters) {
 	cmd.client.setup(params)
 	cmd.sender.setup(params)
 	cmd.required = int64Flag(params, "required", "Number of owner confirmations needed to execute a transaction", 2)
@@ -26,7 +26,7 @@ func (cmd *cmdDebugDeployMultiSig) Setup(params clingy.Parameters) {
 	cmd.owners = repeatedAddressArg(params, "OWNER", "Address of the contract owner (need at least two)")
 }
 
-func (cmd *cmdDebugDeployMultiSig) Execute(ctx context.Context) error {
+func (cmd *cmdTestDeployMultiSig) Execute(ctx context.Context) error {
 	if len(cmd.owners) < 2 {
 		return errors.New("at least two OWNER's are required")
 	}

@@ -8,10 +8,10 @@ import (
 	"storj.io/briskitall/test"
 )
 
-func TestDebugDeployMultiSigCmd(t *testing.T) {
+func TestTestDeployMultiSigCmd(t *testing.T) {
 	harness := test.Run(t)
 
-	stdout := requireCmdSuccess(t, harness, "debug", "deploy", "multisig",
+	stdout := requireCmdSuccess(t, harness, "test", "deploy", "multisig",
 		test.AccountAddress[2], test.AccountAddress[3],
 		"--sender-key-file", test.AccountKeyFile[0],
 	)
