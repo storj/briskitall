@@ -64,37 +64,15 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 func runGeth(t *testing.T) *geth {
 	containerName := os.Getenv("BRISKITALL_TEST_CONTAINER")
 	if containerName == "" {
-		containerName = fmt.Sprintf("geth-test-%d", rand.Uint64())
-
+		containerName = fmt.Sprintf("briskitall-test-%d", rand.Uint64())
 		t.Logf("Starting geth container %q", containerName)
-		runCmd := exec.Command("docker", "run",
-			// docker flags
-			"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go",
-			// geth flags
-			"--dev", "--datadir", ".", "--http", "--http.addr", "0.0.0.0", "--http.api", "eth,web3,net,debug")
-		err := runCmd.Run()
-		require.NoError(t, err, "failed to start geth container")
-		t.Cleanup(func() {
-			require.NoError(t, exec.Command("docker", "stop", containerName, "-s", "kill").Run())
-		})
+		startContainer(t, containerName)
 	} else {
 		t.Logf("Using existing geth container %q", containerName)
 	}
 
 	// Figure out the ephemeral port.
-	stdout := new(bytes.Buffer)
-	portCmd := exec.Command("docker", "port", containerName, "8545/tcp")
-	portCmd.Stdout = stdout
-	err := portCmd.Run()
-	require.NoError(t, err, "failed to get geth container port")
-
-	scanner := bufio.NewScanner(stdout)
-	scanner.Scan()
-	require.NoError(t, scanner.Err(), "failed to read geth container port")
-
-	_, port, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
-	require.True(t, found, "found port")
-
+	port := getLocalPort(t, containerName)
 	t.Logf("Ephemeral local port for container %q: %s", containerName, port)
 	url := "http://localhost:" + port
 
@@ -122,4 +100,33 @@ func runGeth(t *testing.T) *geth {
 
 		containerName: containerName,
 	}
+}
+
+func startContainer(t *testing.T, containerName string) {
+	runCmd := exec.Command("docker", "run",
+		// docker flags
+		"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go",
+		// geth flags
+		"--dev", "--datadir", ".", "--http", "--http.addr", "0.0.0.0", "--http.api", "eth,web3,net,debug")
+	err := runCmd.Run()
+	require.NoError(t, err, "failed to start geth container")
+	t.Cleanup(func() {
+		require.NoError(t, exec.Command("docker", "stop", containerName, "-s", "kill").Run())
+	})
+}
+
+func getLocalPort(t *testing.T, containerName string) string {
+	stdout := new(bytes.Buffer)
+	portCmd := exec.Command("docker", "port", containerName, "8545/tcp")
+	portCmd.Stdout = stdout
+	err := portCmd.Run()
+	require.NoError(t, err, "failed to get geth container port")
+
+	scanner := bufio.NewScanner(stdout)
+	scanner.Scan()
+	require.NoError(t, scanner.Err(), "failed to read geth container port")
+
+	_, port, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
+	require.True(t, found, "found port")
+	return port
 }
