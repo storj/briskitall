@@ -76,7 +76,7 @@ func commands(cmds clingy.Commands) {
 	cmds.New("revoke", "Revoke confirmation on a pending transaction", new(cmdRevoke))
 
 	cmds.Break()
-	cmds.Group("debug", "Submit transaction to the multisig contract", func() {
+	cmds.Group("test", "Run test dommands", func() {
 		cmds.Group("deploy", "Submit transaction to the multisig contract", func() {
 			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdDebugDeployMultiSig))
 			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdDebugDeployToken))
