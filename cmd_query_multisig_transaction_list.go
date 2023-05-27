@@ -18,7 +18,7 @@ func (cmd *cmdQueryMultiSigTransactionList) Setup(params clingy.Parameters) {
 	cmd.caller.setup(params)
 	cmd.pending = toggleFlag(params, "pending", "List pending transactions", true)
 	cmd.executed = toggleFlag(params, "executed", "List executed transactions", false)
-	cmd.status = boolFlag(params, "status", "Show the transaction status", false)
+	cmd.status = boolFlag(params, "status", "Show the transaction status")
 }
 
 func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {

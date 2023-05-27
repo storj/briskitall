@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -13,6 +14,7 @@ import (
 type cmdTestDeployToken struct {
 	client      depClient
 	sender      depSender
+	output      depOutput
 	owner       common.Address
 	name        string
 	symbol      string
@@ -23,8 +25,9 @@ type cmdTestDeployToken struct {
 func (cmd *cmdTestDeployToken) Setup(params clingy.Parameters) {
 	cmd.client.setup(params)
 	cmd.sender.setup(params)
-	cmd.name = stringFlag(params, "name", "Name of the token", "STORJ Token")
-	cmd.symbol = stringFlag(params, "symbol", "Symbol of the token", "STORJ")
+	cmd.output.setup(params)
+	cmd.name = stringFlag(params, "name", "Name of the token", "Test Token")
+	cmd.symbol = stringFlag(params, "symbol", "Symbol of the token", "TEST")
 	cmd.totalSupply = bigIntFlag(params, "supply", "Total supply of the token", big.NewInt(10000000000))
 	cmd.decimals = int64Flag(params, "decimals", "Number of decimals in the token", 8)
 	cmd.owner = addressArg(params, "OWNER", "Address of the contract owner")
@@ -45,6 +48,14 @@ func (cmd *cmdTestDeployToken) Execute(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Fprintln(clingy.Stdout(ctx), "Contract Address:", contractAddress)
+	cmd.output.out(ctx, outTestDeployMultiSig{ContractAddress: contractAddress})
 	return nil
+}
+
+type outTestDeployToken struct {
+	ContractAddress common.Address
+}
+
+func (out outTestDeployToken) TextOut(w io.Writer) {
+	fmt.Fprintln(w, "Token contract address:", out.ContractAddress)
 }

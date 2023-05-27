@@ -16,5 +16,5 @@ func TestTestDeployTokenCmd(t *testing.T) {
 		"--sender-key-file", test.AccountKeyFile[0],
 	)
 
-	assert.Contains(t, stdout, "Contract Address: 0x564f2b59695a90e38164FC7411abAF6346553701\n")
+	assert.Contains(t, stdout, "Token contract address: 0x564f2b59695a90e38164FC7411abAF6346553701\n")
 }

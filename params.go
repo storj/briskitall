@@ -45,8 +45,8 @@ func toggleFlag(params clingy.Parameters, name, desc string, def bool) bool {
 	return params.Flag(name, desc, def, clingy.Transform(strconv.ParseBool)).(bool)
 }
 
-func boolFlag(params clingy.Parameters, name, desc string, def bool) bool {
-	return params.Flag(name, desc, def, clingy.Transform(strconv.ParseBool), clingy.Boolean).(bool)
+func boolFlag(params clingy.Parameters, name, desc string) bool {
+	return params.Flag(name, desc, false, clingy.Transform(strconv.ParseBool), clingy.Boolean).(bool)
 }
 
 func stringFlag(params clingy.Parameters, name, desc, def string) string {
