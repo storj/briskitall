@@ -48,7 +48,7 @@ func (cmd *cmdTestDeployToken) Execute(ctx context.Context) error {
 		return err
 	}
 
-	cmd.output.out(ctx, outTestDeployMultiSig{ContractAddress: contractAddress})
+	cmd.output.out(ctx, outTestDeployToken{ContractAddress: contractAddress})
 	return nil
 }
 
