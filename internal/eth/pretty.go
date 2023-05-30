@@ -7,7 +7,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Pretty is lovingly borrowed from storj/crypto-batch-payment
 func Pretty(wei *big.Int) string {
 	switch {
 	case wei.Cmp(big.NewInt(1_000_000_000_000_000)) > 0:

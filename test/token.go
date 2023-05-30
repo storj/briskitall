@@ -85,7 +85,7 @@ func deployTokenContract(t *testing.T, opts *bind.TransactOpts, client *ethclien
 	decimals := int64(8)
 	waiter := eth.ProgressWaiter(client, WaitProgress(t))
 
-	contractAddress, err := token.DeployContract(opts, client, multiSigContractAddress, "STORJ Token", "STORJ", InitialSupply, decimals, waiter)
+	contractAddress, err := token.DeployContract(opts, client, multiSigContractAddress, "Test Token", "TEST", InitialSupply, decimals, waiter)
 	require.NoError(t, err)
 	return contractAddress
 }
