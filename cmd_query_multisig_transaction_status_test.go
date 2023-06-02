@@ -23,8 +23,8 @@ func TestQueryMultiSigTransactionStatusCmd(t *testing.T) {
   Confirmations(1):
     - Owner(%s)
   Events(2):
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(%s)
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Confirmation(%s)
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Submission()
 `, transactionID,
 		harness.MultiSig.ContractAddress,
 		test.AccountAddress[2],
@@ -44,10 +44,10 @@ func TestQueryMultiSigTransactionStatusCmd(t *testing.T) {
     - Owner(%s)
     - Owner(%s)
   Events(4):
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(%s)
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
-    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Confirmation(%s)
-    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Execution()
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Confirmation(%s)
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Submission()
+    - ETH[0xcf7cd4509886c47f9e0fb416ee996e45190d75fb5fccb3561d8bd60c5554f2ce]: Confirmation(%s)
+    - ETH[0xcf7cd4509886c47f9e0fb416ee996e45190d75fb5fccb3561d8bd60c5554f2ce]: Execution()
 `, transactionID,
 		harness.MultiSig.ContractAddress,
 		test.AccountAddress[2],

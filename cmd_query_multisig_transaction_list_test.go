@@ -17,8 +17,8 @@ func TestQueryMultiSigTransactionListCmd(t *testing.T) {
   Confirmations(1):
     - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
   Events(2):
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Submission()
 `
 	const expectedExecuted = `Transaction 0:
   Destination = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
@@ -29,10 +29,10 @@ func TestQueryMultiSigTransactionListCmd(t *testing.T) {
     - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
     - Owner(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
   Events(4):
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
-    - ETH[0xb178bdc2bab8511dec202c1536b9211ef04aa10c5f2230319b6f049e920a2d93]: Submission()
-    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
-    - ETH[0xa133a7cf683c9b7401c9614fb553b9914deb9ded49224d963ee7bd3e0a946325]: Execution()
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - ETH[0x43e7062198defbef1d15aaf5af8b952d2a0442c7f90ac59efe668cdfef6a8694]: Submission()
+    - ETH[0xcf7cd4509886c47f9e0fb416ee996e45190d75fb5fccb3561d8bd60c5554f2ce]: Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
+    - ETH[0xcf7cd4509886c47f9e0fb416ee996e45190d75fb5fccb3561d8bd60c5554f2ce]: Execution()
 `
 
 	harness := test.Run(t)

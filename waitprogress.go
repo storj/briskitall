@@ -42,11 +42,6 @@ func (p *waitProgress) Start(hash common.Hash) {
 	p.s.Start()
 }
 
-func (p *waitProgress) Tick() {
-	time.Sleep(time.Second * 1)
-	p.s.Stop()
-}
-
 func (p *waitProgress) Canceled() {
 	p.s.Stop()
 	emoji.Fprintf(p.stdout, "ETH[%s]: Wait cancelled :see_no_evil:(may still confirm).\n", p.hash)

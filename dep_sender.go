@@ -40,6 +40,9 @@ func (dep *depSender) transactOpts(ctx context.Context) (*bind.TransactOpts, err
 		if err != nil {
 			return nil, errs.Wrap(err)
 		}
+		if dep.sender == (common.Address{}) {
+			return nil, fmt.Errorf("--sender (or env %s) is required when using clef", envSender)
+		}
 		return bind.NewClefTransactor(clef, accounts.Account{Address: dep.sender}), nil
 	case dep.clefEndpoint == "" && dep.senderKeyFile != "":
 		key, sender, err := loadETHKey(dep.senderKeyFile, "sender key file")

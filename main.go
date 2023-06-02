@@ -81,5 +81,8 @@ func commands(cmds clingy.Commands) {
 			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdTestDeployMultiSig))
 			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdTestDeployToken))
 		})
+		cmds.Group("eth", "Convenience ETH commands for testing", func() {
+			cmds.New("transfer", "Transfers ETH", new(cmdTestETHTransfer))
+		})
 	})
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeebo/errs"
+
 	"storj.io/briskitall/internal/contract"
 	"storj.io/briskitall/internal/eth"
 )
@@ -16,7 +17,7 @@ func DeployContract(opts *bind.TransactOpts, client *ethclient.Client, owner com
 	if err != nil {
 		return common.Address{}, errs.Wrap(err)
 	}
-	if _, err = eth.WaitForTransaction(opts.Context, client, contractTx.Hash(), nil); err != nil {
+	if _, err = waiter.Wait(opts.Context, contractTx.Hash()); err != nil {
 		return common.Address{}, errs.Wrap(err)
 	}
 	return contractAddress, nil
