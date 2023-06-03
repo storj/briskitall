@@ -1,0 +1,62 @@
+version: "3.9"
+services:
+  geth:
+    image: "ethereum/client-go:latest"
+    user: "${DOCKER_USER}"
+    command:
+      - --http
+      - --http.api=eth
+      - --http.addr=0.0.0.0
+      - --authrpc.vhosts=*
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.jwtsecret=/runtime/geth/jwt.hex
+      - --datadir=/runtime/geth
+      - --nodiscover
+      - --syncmode=full
+      - --signer=/runtime/clef/clef.ipc
+    ports:
+      - 8551:8551 # used by the beacon chain
+      - 8545:8545 # used by ethereum clients
+    volumes:
+      - ./runtime:/runtime
+
+  beacon-chain:
+    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:latest"
+    user: "${DOCKER_USER}"
+    command:
+      - --datadir=/consensus/beacondata
+      - --min-sync-peers=0
+      - --genesis-state=/consensus/genesis.ssz
+      - --interop-eth1data-votes
+      - --bootstrap-node=
+      - --chain-config-file=/consensus/config.yaml
+      - --chain-id=${CHAINID}
+      - --rpc-host=0.0.0.0
+      - --grpc-gateway-host=0.0.0.0
+      - --execution-endpoint=http://geth:8551
+      - --accept-terms-of-use
+      - --jwt-secret=/consensus/jwt.hex
+      - --suggested-fee-recipient=${ROOT_ACCOUNT}
+    depends_on:
+      geth:
+        condition: service_started
+    ports:
+      - 4000:4000 # used by the validator
+    volumes:
+      - ./runtime/consensus:/consensus
+
+  validator:
+    image: "gcr.io/prysmaticlabs/prysm/validator:latest"
+    user: "${DOCKER_USER}"
+    command:
+      - --beacon-rpc-provider=beacon-chain:4000
+      - --datadir=/consensus/validatordata
+      - --accept-terms-of-use
+      - --interop-num-validators=64
+      - --interop-start-index=0
+      - --chain-config-file=/consensus/config.yaml
+    depends_on:
+      beacon-chain:
+        condition: service_started
+    volumes:
+      - ./runtime/consensus:/consensus

@@ -7,13 +7,19 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var (
-	//go:embed testdata/*.key
+	//go:embed testdata/root.key
+	rootKeyBytes []byte
+	rootKey      = check(crypto.HexToECDSA(strings.TrimSpace(string(rootKeyBytes))))
+	rootAddress  = crypto.PubkeyToAddress(rootKey.PublicKey)
+
+	//go:embed testdata/account-?.key
 	accountKeys embed.FS
 
 	AccountKeyFile []string

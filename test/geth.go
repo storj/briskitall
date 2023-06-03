@@ -15,14 +15,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
-)
-
-var (
-	rootKey, _  = crypto.HexToECDSA("2f848fedfb66568f602ec294639afacab7ad594cee607054e7c4b705e2c7b126")
-	rootAddress = crypto.PubkeyToAddress(rootKey.PublicKey)
 )
 
 type geth struct {
