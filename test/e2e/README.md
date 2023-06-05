@@ -21,10 +21,11 @@ This script prepares a `./runtime` directory with all of the necessary
 configuration, including:
 
 1. Geth data directory initialized with:
-  - Proof of stake consensus (with signer accounts seeded with 10000 ETH each).
-  - [Test accounts](../testdata) seeded with 10 ETH each.
+    - Proof of stake consensus (with signer accounts seeded with 10000 ETH each).
+    - [Test accounts](../testdata) seeded with 10 ETH each.
 1. Beacon chain data directory.
-1. Clef with all [test accounts](../testdata) imported.
+1. Clef masterseed and keystore with all [test accounts](../testdata) imported.
+    - password for masterseed and all accounts is placed in `./runtime/clef/pwd.txt`
 
 # Starting
 
@@ -49,7 +50,7 @@ First things first, you probably want to deploy the MultiSig contract. The follo
     ETH[0x4354d30f214b930e153ddaa6bac05ed210b8fd19e7c5e0abc351be559780bb10]: Confirmed ✅ 
     MultiSig contract address: 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
 
-For convenience, you can export the BRISKATALL_MULTISIG_CONTRACT_ADDRESS variable with the contract address outputted by the deploy command. Alternatively you can pass it via the --multisig-contract-address flag to all commands that need it:
+For convenience, you can export the `BRISKATALL_MULTISIG_CONTRACT_ADDRESS` variable with the contract address output by the deploy command. Alternatively you can pass it via the `--multisig-contract-address` flag to all commands that need it:
 
     $ export BRISKITALL_MULTISIG_CONTRACT_ADDRESS=0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
 
@@ -68,7 +69,7 @@ Now the token contract can be deployed with the MultiSig contract as the owner:
     ETH[0x2fec25f4d138267e00b1b95fe9bd6c2691ae4d6ce334dbc2f1be9106cba3bcdf]: Confirmed ✅ 
     Token contract address: 0x9AB60992B6257c65A89D141f24d4ec7BE5241366
 
-Once again, for convenience, you can export the BRISKATALL_TOKEN_CONTRACT_ADDRESS variable with the contract address outputted by the deploy command. Alternatively you can pass it via the --token-contract-address flag to all commands that need it:
+Once again, for convenience, you can export the `BRISKATALL_TOKEN_CONTRACT_ADDRESS` variable with the contract address output by the deploy command. Alternatively you can pass it via the `--token-contract-address` flag to all commands that need it:
 
     $ export BRISKITALL_TOKEN_CONTRACT_ADDRESS=0x9AB60992B6257c65A89D141f24d4ec7BE5241366
 

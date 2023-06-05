@@ -56,7 +56,7 @@ Brisk-It-All can use private keys from the following:
 
 ## End-to-End Testing
 
-Go [here](./test/e2e)
+Instructions are available [here](./test/e2e).
 
 ## Risks
 
