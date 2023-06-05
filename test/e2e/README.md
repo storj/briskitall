@@ -32,10 +32,12 @@ configuration, including:
 1. Start clef. This is run outside of docker-compose because its easier to interact with it for approving transactions, etc. You will be prompted to enter the master password, which will have been printed just above the prompt for convenience. It is also stored in the ./runtime/clef/pwd.txt file.
 
     $ ./clef.sh
+    ... <prompt to enter master password> ...
 
-2. Bring up geth and the prysm beacon chain and validtor.
+2. Bring up geth and the prysm beacon chain and validator.
 
     $ docker compose up -d
+    ...
 
 # Playing Around
 
@@ -77,3 +79,9 @@ Then to check that everything is working, you can list the token balance of the 
 
     $ ./briskitall.sh query token balance "${BRISKITALL_MULTISIG_CONTRACT_ADDRESS}"
     10000000000
+
+# Tear Down
+
+- Stop the docker containers (i.e. `docker compose down`)
+- Ctrl-C the clef process.
+- Delete the runtime directory (`rm -rf ./runtime`)
