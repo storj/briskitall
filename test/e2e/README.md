@@ -3,7 +3,7 @@
 This directory contains helper scripts used to test brisk-it-all against a
 "real" test network. Geth developer mode is fine for unit-testing but
 unfortunately does not support using an external signer (via --signer). This
-means we cannot use Geth developer mode to teste against clef-managed accounts.
+means we cannot use Geth developer mode to test against clef-managed accounts.
 
 ## Prerequisites
 
