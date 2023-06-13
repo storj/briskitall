@@ -6,19 +6,18 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
+
 	"storj.io/briskitall/internal/eth"
 )
 
 type cmdQueryETHBalance struct {
-	client   depClient
-	multiSig depMultiSig
-	address  *common.Address
+	client  depClient
+	address common.Address
 }
 
 func (cmd *cmdQueryETHBalance) Setup(params clingy.Parameters) {
 	cmd.client.setup(params)
-	cmd.multiSig.setup(params)
-	cmd.address = optAddressArg(params, "ADDRESS", "Address to obtain ETH balance for (multisig contract if unset)")
+	cmd.address = addressArg(params, "ADDRESS", "Address to obtain ETH balance for")
 }
 
 func (cmd *cmdQueryETHBalance) Execute(ctx context.Context) error {
@@ -27,12 +26,7 @@ func (cmd *cmdQueryETHBalance) Execute(ctx context.Context) error {
 		return err
 	}
 
-	address := cmd.multiSig.contractAddress
-	if cmd.address != nil {
-		address = *cmd.address
-	}
-
-	balance, err := client.BalanceAt(ctx, address, nil)
+	balance, err := client.BalanceAt(ctx, cmd.address, nil)
 	if err != nil {
 		return err
 	}
