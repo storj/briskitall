@@ -8,14 +8,13 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/kyokomi/emoji/v2"
 	"github.com/zeebo/clingy"
 
 	"storj.io/briskitall/internal/eth"
 )
 
-func waiter(ctx context.Context, client *ethclient.Client) eth.Waiter {
+func waiter(ctx context.Context, client eth.WaitBackend) eth.Waiter {
 	return eth.ProgressWaiter(client, newWaitProgress(ctx))
 }
 

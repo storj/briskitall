@@ -7,11 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeebo/errs"
 )
 
-func Transfer(opts *bind.TransactOpts, client *ethclient.Client, recipient common.Address, amount *big.Int, waiter Waiter) (err error) {
+func Transfer(opts *bind.TransactOpts, client bind.ContractTransactor, recipient common.Address, amount *big.Int, waiter Waiter) (err error) {
 	ctx := opts.Context
 	if ctx == nil {
 		ctx = context.Background()
