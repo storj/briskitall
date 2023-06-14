@@ -20,16 +20,21 @@ func (dep *depMultiSigTransactor) setup(params clingy.Parameters) {
 	dep.sender.setup(params)
 }
 
-func (dep *depMultiSigTransactor) open(ctx context.Context) (*multisig.Transactor, error) {
+func (dep *depMultiSigTransactor) open(ctx context.Context) (*multisig.Transactor, func(), error) {
 	client, err := dep.client.open(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	opts, err := dep.sender.transactOpts(ctx, client)
+	opts, done, err := dep.sender.transactOpts(ctx, client)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return multisig.NewTransactor(client, dep.multiSig.contractAddress, opts.From, opts.Signer, waiter(ctx, client))
+	transactor, err := multisig.NewTransactor(client, dep.multiSig.contractAddress, opts.From, opts.Signer, waiter(ctx, client))
+	if err != nil {
+		done()
+		return nil, nil, err
+	}
+	return transactor, done, nil
 }

@@ -39,10 +39,11 @@ func (cmd *cmdTestDeployMultiSig) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	opts, err := cmd.sender.transactOpts(ctx, client)
+	opts, done, err := cmd.sender.transactOpts(ctx, client)
 	if err != nil {
 		return err
 	}
+	defer done()
 
 	contractAddress, err := multisig.DeployContract(opts, client, cmd.owners, cmd.required, cmd.dailyLimit, waiter(ctx, client))
 	if err != nil {

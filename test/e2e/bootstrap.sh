@@ -67,28 +67,6 @@ init_geth() {
             init /runtime/geth/genesis.json
 }
 
-reset_clef() {
-    rm -rf ./runtime/clef
-    mkdir ./runtime/clef
-    local _pwd=$(openssl rand -hex 12 | tee ./runtime/clef/pwd.txt)
-    # Even though there is no UI RPCs that happen with "init", the side-effect
-    # of passing --stdio-ui to clef allows it to accept the password via the
-    # echoed input.
-    # TODO: This might break in the future.
-    echo "Initializing clef..."
-    echo -e "${_pwd}\n${_pwd}\n" | clef --suppress-bootwarn --stdio-ui init --configdir ./runtime/clef > /dev/null
-
-    # Now import the accounts
-    for key in ../testdata/*.key; do
-        echo "Importing $(basename $key)..."
-        echo -e "${_pwd}\n${_pwd}\n" | \
-            clef importraw \
-                --suppress-bootwarn \
-                --keystore ./runtime/clef/keystore \
-                "$key" > /dev/null
-    done 
-}
-
 bootstrap() {
     prepare_runtime
     generate_env
@@ -96,7 +74,6 @@ bootstrap() {
     generate_beacon_chain_genesis
     generate_beacon_chain_auth_secret
     init_geth
-    reset_clef
 }
 
 if [ -z "$1" ]; then

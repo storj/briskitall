@@ -1,9 +1,7 @@
 # End-to-End Testing
 
 This directory contains helper scripts used to test brisk-it-all against a
-"real" test network. Geth developer mode is fine for unit-testing but
-unfortunately does not support using an external signer (via --signer). This
-means we cannot use Geth developer mode to test against clef-managed accounts.
+"real" test network (i.e. not developer-mode geth).
 
 ## Prerequisites
 
@@ -24,24 +22,17 @@ configuration, including:
     - Proof of stake consensus (with signer accounts seeded with 10000 ETH each).
     - [Test accounts](../testdata) seeded with 10 ETH each.
 1. Beacon chain data directory.
-1. Clef masterseed and keystore with all [test accounts](../testdata) imported.
-    - password for masterseed and all accounts is placed in `./runtime/clef/pwd.txt`
 
 # Starting
 
-1. Start clef. This is run outside of docker-compose because its easier to interact with it for approving transactions, etc. You will be prompted to enter the master password, which will have been printed just above the prompt for convenience. It is also stored in the ./runtime/clef/pwd.txt file.
-
-    $ ./clef.sh
-    ... <prompt to enter master password> ...
-
-2. Bring up geth and the prysm beacon chain and validator.
+1. Bring up geth and the prysm beacon chain and validator.
 
     $ docker compose up -d
     ...
 
 # Playing Around
 
-The `./briskitall.sh` script is a small helper script that wraps execution of `briskitall` with a few helpful environment variables (e.g. the chain ID, the geth node URL, the clef endpoint).
+The `./briskitall.sh` script is a small helper script that wraps execution of `briskitall` with a few helpful environment variables (e.g. the chain ID, the geth node URL).
 
 ## Deploy the MultiSig contract
 
@@ -83,5 +74,4 @@ Then to check that everything is working, you can list the token balance of the 
 # Tear Down
 
 - Stop the docker containers (i.e. `docker compose down`)
-- Ctrl-C the clef process.
 - Delete the runtime directory (`rm -rf ./runtime`)

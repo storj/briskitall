@@ -46,6 +46,11 @@ func commands(cmds clingy.Commands) {
 			cmds.New("balance", "Retrieves the token balance of an address", new(cmdQueryTokenBalance))
 			cmds.New("upgrade-master", "Retrieves the token upgrade master", new(cmdQueryTokenUpgradeMaster))
 		})
+		cmds.Group("usbwallet", "Query the USB wallet", func() {
+			cmds.Group("account", "Query USB wallet accounts", func() {
+				cmds.New("list", "List all USB wallet accounts", new(cmdQueryUSBWalletAccountList))
+			})
+		})
 	})
 
 	cmds.Break()
@@ -76,7 +81,7 @@ func commands(cmds clingy.Commands) {
 	cmds.New("revoke", "Revoke confirmation on a pending transaction", new(cmdRevoke))
 
 	cmds.Break()
-	cmds.Group("test", "Run test dommands", func() {
+	cmds.Group("test", "Run test commands", func() {
 		cmds.Group("deploy", "Submit transaction to the multisig contract", func() {
 			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdTestDeployMultiSig))
 			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdTestDeployToken))

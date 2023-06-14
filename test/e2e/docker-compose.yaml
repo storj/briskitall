@@ -13,7 +13,6 @@ services:
       - --datadir=/runtime/geth
       - --nodiscover
       - --syncmode=full
-      - --signer=/runtime/clef/clef.ipc
     ports:
       - 8551:8551 # used by the beacon chain
       - 8545:8545 # used by ethereum clients

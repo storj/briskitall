@@ -39,10 +39,11 @@ func (cmd *cmdTestDeployToken) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	opts, err := cmd.sender.transactOpts(ctx, client)
+	opts, done, err := cmd.sender.transactOpts(ctx, client)
 	if err != nil {
 		return err
 	}
+	defer done()
 
 	contractAddress, err := token.DeployContract(opts, client, cmd.owner, cmd.name, cmd.symbol, cmd.totalSupply, cmd.decimals, waiter(ctx, client))
 	if err != nil {

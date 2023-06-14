@@ -21,10 +21,12 @@ func (cmd *cmdSubmitMultisigOwnerReplace) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdSubmitMultisigOwnerReplace) Execute(ctx context.Context) error {
-	transactor, err := cmd.transactor.open(ctx)
+	transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
+	defer done()
+
 	transactionID, err := transactor.SubmitReplaceOwner(ctx, cmd.oldOwner, cmd.newOwner)
 	if err != nil {
 		return err

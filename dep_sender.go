@@ -7,9 +7,7 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -23,67 +21,77 @@ var (
 )
 
 type depSender struct {
-	sender           common.Address
+	usbWallet        depUSBWalletAccount
 	senderKeyFile    string
 	chainID          *big.Int
-	clefEndpoint     string
 	skipConfirmation bool
 }
 
 func (dep *depSender) setup(params clingy.Parameters) {
-	dep.sender = optionalAddressEnvFlag(params, "sender", "Sender address", common.Address{}, envSender)
+	dep.usbWallet.setup(params)
 	dep.senderKeyFile = optionalStringEnvFlag(params, "sender-key-file", "Path on disk to the sender private key", "", envSenderKeyFile)
-	dep.clefEndpoint = optionalStringEnvFlag(params, "clef-endpoint", "Clef endpoint", "", envClefEndpoint)
 	dep.chainID = optionalBigIntEnvFlag(params, "chain-id", "Chain ID", defChainID, envChainID)
 	dep.skipConfirmation = boolEnvFlag(params, "skip-confirmation", "Skips confirmation before transacting", envSkipConfirmation)
 }
 
-func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client) (*bind.TransactOpts, error) {
-	// --sender-key-file and --clef-endpoint are mutually exclusive
-	var opts *bind.TransactOpts
-	switch {
-	case dep.clefEndpoint == "" && dep.senderKeyFile == "":
-		return nil, errors.New("must specify one of --sender-key-file or --clef-endpoint")
-	case dep.clefEndpoint != "" && dep.senderKeyFile == "":
-		clef, err := external.NewExternalSigner(dep.clefEndpoint)
+func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client) (opts *bind.TransactOpts, done func(), err error) {
+	senderChoices := 0
+
+	eip155Only := false
+
+	if dep.senderKeyFile != "" {
+		eip155Only = false
+		senderChoices++
+	}
+
+	if dep.usbWallet.enabled() {
+		eip155Only = true
+		senderChoices++
+	}
+
+	if senderChoices == 0 {
+		return nil, nil, errors.New("must specify one of --sender-key-file or --usb-wallet-account")
+	}
+	if senderChoices > 1 {
+		return nil, nil, errors.New("can only specify one of --sender-key-file or --usb-wallet-account")
+	}
+
+	if dep.senderKeyFile != "" {
+		key, err := loadETHKey(dep.senderKeyFile)
 		if err != nil {
-			return nil, errs.Wrap(err)
-		}
-		if dep.sender == (common.Address{}) {
-			return nil, fmt.Errorf("--sender (or env %s) is required when using clef", envSender)
-		}
-		opts, err = bind.NewClefTransactor(clef, accounts.Account{Address: dep.sender}), nil
-		if err != nil {
-			return nil, errs.Wrap(err)
-		}
-		// The hardware wallets only support "legacy" EIP155 transactions, so
-		// we need to define the gas price.
-		opts.GasPrice, err = client.SuggestGasPrice(ctx)
-		if err != nil {
-			return nil, errs.Wrap(err)
-		}
-	case dep.clefEndpoint == "" && dep.senderKeyFile != "":
-		key, sender, err := loadETHKey(dep.senderKeyFile, "sender key file")
-		if err != nil {
-			return nil, errs.Wrap(err)
-		}
-		switch {
-		case dep.sender == (common.Address{}):
-			dep.sender = sender
-		case dep.sender != sender:
-			return nil, fmt.Errorf("sender %q does not match sender key address %q", dep.sender, sender)
+			return nil, nil, errs.Wrap(err)
 		}
 		opts, err = bind.NewKeyedTransactorWithChainID(key, dep.chainID)
 		if err != nil {
-			return nil, errs.Wrap(err)
+			return nil, nil, errs.Wrap(err)
 		}
-	case dep.clefEndpoint != "" && dep.senderKeyFile != "":
-		return nil, errors.New("cannot specify both --sender-key-file and --clef-endpoint")
+	}
+
+	if dep.usbWallet.enabled() {
+		opts, done, err = dep.usbWallet.transactOpts(dep.chainID)
+		if err != nil {
+			return nil, nil, errs.Wrap(err)
+		}
+		// Ensure the wallet is closed if there is an error
+		defer func() {
+			if err != nil {
+				done()
+			}
+		}()
+	}
+
+	// For transactors that only support EIP155 transactions we need to
+	// define the gas price to trigger a "legacy" transaction to be signed.
+	if eip155Only {
+		opts.GasPrice, err = client.SuggestGasPrice(ctx)
+		if err != nil {
+			return nil, nil, errs.Wrap(err)
+		}
 	}
 
 	opts.Signer = confirmingSigner(ctx, opts.Signer, dep.skipConfirmation)
 	opts.Context = ctx
-	return opts, nil
+	return opts, done, nil
 }
 
 func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip bool) bind.SignerFn {

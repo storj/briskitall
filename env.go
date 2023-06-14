@@ -5,8 +5,7 @@ const (
 	envMultiSigContractAddress = "BRISKITALL_MULTISIG_CONTRACT_ADDRESS"
 	envTokenContractAddress    = "BRISKITALL_TOKEN_CONTRACT_ADDRESS"
 	envChainID                 = "BRISKITALL_CHAINID"
-	envSender                  = "BRISKITALL_SENDER"
 	envSenderKeyFile           = "BRISKITALL_SENDER_KEY_FILE"
-	envClefEndpoint            = "BRISKITALL_CLEF_ENDPOINT"
+	envUSBWalletAccount        = "BRISKITALL_USBWALLET_ACCOUNT"
 	envSkipConfirmation        = "BRISKITALL_SKIP_CONFIRMATION"
 )

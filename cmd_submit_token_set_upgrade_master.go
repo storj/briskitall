@@ -21,10 +21,12 @@ func (cmd *cmdSubmitTokenSetUpgradeMaster) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdSubmitTokenSetUpgradeMaster) Execute(ctx context.Context) error {
-	transactor, err := cmd.transactor.open(ctx)
+	transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
+	defer done()
+
 	transactionID, err := transactor.SubmitSetUpgradeMaster(ctx, cmd.token.contractAddress, cmd.master)
 	if err != nil {
 		return err

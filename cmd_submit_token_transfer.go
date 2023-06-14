@@ -24,10 +24,12 @@ func (cmd *cmdSubmitTokenTransfer) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdSubmitTokenTransfer) Execute(ctx context.Context) error {
-	transactor, err := cmd.transactor.open(ctx)
+	transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
+	defer done()
+
 	transactionID, err := transactor.SubmitTokenTransfer(ctx, cmd.token.contractAddress, cmd.recipient, cmd.amount)
 	if err != nil {
 		return err

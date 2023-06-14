@@ -45,10 +45,11 @@ func (cmd *cmdSubmitContractCall) Execute(ctx context.Context) error {
 		return err
 	}
 
-	transactor, err := cmd.transactor.open(ctx)
+	transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
+	defer done()
 
 	transactionID, err := transactor.SubmitTransaction(ctx, cmd.address, cmd.value, data)
 	if err != nil {

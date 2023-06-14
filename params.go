@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"strconv"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
 )
@@ -87,6 +88,10 @@ func optionalBigIntEnvFlag(params clingy.Parameters, name, desc string, def *big
 
 func requiredBigIntEnvFlag(params clingy.Parameters, name, desc string, env string) *big.Int {
 	return params.Flag(name, desc, clingy.Required, clingy.Getenv(env), clingy.Transform(transformBigInt)).(*big.Int)
+}
+
+func optionalDerivationPathFlag(params clingy.Parameters, name, desc string, def accounts.DerivationPath) accounts.DerivationPath {
+	return params.Flag(name, desc, def, clingy.Transform(accounts.ParseDerivationPath)).(accounts.DerivationPath)
 }
 
 func transformInt64(s string) (int64, error) {
