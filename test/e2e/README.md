@@ -20,7 +20,7 @@ configuration, including:
 
 1. Geth data directory initialized with:
     - Proof of stake consensus (with signer accounts seeded with 10000 ETH each).
-    - [Test accounts](../testdata) seeded with 10 ETH each.
+    - Accounts in [seed.txt](./seed.txt) seeded with 1 ETH each.
 1. Beacon chain data directory.
 
 # Starting

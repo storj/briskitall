@@ -32,13 +32,12 @@ update_geth_genesis() {
         ./runtime/geth/genesis.json > ./runtime/geth/genesis.json.tmp
     mv ./runtime/geth/genesis.json{.tmp,}
 
-    for addrfile in ../testdata/*.addr; do
-        local _addr=$(cat $addrfile)
-        echo "Seeding $(basename $_addr) with 1 ETH..."
-        jq --arg addr "$_addr" '.alloc[$addr] = { "balance": "0xDE0B6B3A7640000" }' \
+    while read -r addr; do
+        echo "Seeding $addr with 1 ETH..."
+        jq --arg addr "$addr" '.alloc[$addr] = { "balance": "0xDE0B6B3A7640000" }' \
             ./runtime/geth/genesis.json > ./runtime/geth/genesis.json.tmp
         mv ./runtime/geth/genesis.json{.tmp,}
-    done
+    done < seed.txt
 }
 
 generate_beacon_chain_genesis() {
