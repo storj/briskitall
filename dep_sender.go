@@ -35,8 +35,9 @@ func (dep *depSender) setup(params clingy.Parameters) {
 }
 
 func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client) (opts *bind.TransactOpts, done func(), err error) {
-	senderChoices := 0
+	done = func() {}
 
+	senderChoices := 0
 	eip155Only := false
 
 	if dep.senderKeyFile != "" {
