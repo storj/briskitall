@@ -6,6 +6,6 @@ const (
 	envTokenContractAddress    = "BRISKITALL_TOKEN_CONTRACT_ADDRESS"
 	envChainID                 = "BRISKITALL_CHAINID"
 	envSenderKeyFile           = "BRISKITALL_SENDER_KEY_FILE"
-	envUSBWalletAccount        = "BRISKITALL_USBWALLET_ACCOUNT"
+	envUSBWalletAccount        = "BRISKITALL_USB_WALLET_ACCOUNT"
 	envSkipConfirmation        = "BRISKITALL_SKIP_CONFIRMATION"
 )

@@ -19,8 +19,7 @@ type Transactor struct {
 	transactor      *contract.MultiSigWalletWithDailyLimitTransactor
 	filterer        *contract.MultiSigWalletWithDailyLimitFilterer
 	contractAddress common.Address
-	senderAddress   common.Address
-	senderSigner    bind.SignerFn
+	opts            *bind.TransactOpts
 	waiter          eth.Waiter
 }
 
@@ -30,7 +29,7 @@ type TransactorBackend interface {
 	eth.WaitBackend
 }
 
-func NewTransactor(backend TransactorBackend, contractAddress, senderAddress common.Address, senderSigner bind.SignerFn, waiter eth.Waiter) (*Transactor, error) {
+func NewTransactor(backend TransactorBackend, contractAddress common.Address, opts *bind.TransactOpts, waiter eth.Waiter) (*Transactor, error) {
 	if waiter == nil {
 		waiter = eth.SilentWaiter(backend)
 	}
@@ -55,14 +54,9 @@ func NewTransactor(backend TransactorBackend, contractAddress, senderAddress com
 		transactor:      transactor,
 		filterer:        filterer,
 		contractAddress: contractAddress,
-		senderAddress:   senderAddress,
-		senderSigner:    senderSigner,
+		opts:            opts,
 		waiter:          waiter,
 	}, nil
-}
-
-func (t *Transactor) Sender() common.Address {
-	return t.senderAddress
 }
 
 func (t *Transactor) SubmitAddOwner(ctx context.Context, owner common.Address) (uint64, error) {
@@ -247,9 +241,7 @@ func (t *Transactor) getTransactionIDFromSubmissionEvent(ctx context.Context, bl
 }
 
 func (t *Transactor) transactOpts(ctx context.Context) *bind.TransactOpts {
-	return &bind.TransactOpts{
-		From:    t.senderAddress,
-		Signer:  t.senderSigner,
-		Context: ctx,
-	}
+	opts := t.opts
+	opts.Context = ctx
+	return opts
 }

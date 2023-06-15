@@ -31,7 +31,7 @@ func (dep *depMultiSigTransactor) open(ctx context.Context) (*multisig.Transacto
 		return nil, nil, err
 	}
 
-	transactor, err := multisig.NewTransactor(client, dep.multiSig.contractAddress, opts.From, opts.Signer, waiter(ctx, client))
+	transactor, err := multisig.NewTransactor(client, dep.multiSig.contractAddress, opts, waiter(ctx, client))
 	if err != nil {
 		done()
 		return nil, nil, err

@@ -103,6 +103,7 @@ func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip bool) bind
 		call := tryDecodeCall(tx.Data())
 
 		fmt.Fprintf(out, "Preparing to send transaction:\n")
+		fmt.Fprintf(out, "  Type...........: %s\n", txType(tx.Type()))
 		fmt.Fprintf(out, "  From...........: %s\n", sender)
 		fmt.Fprintf(out, "  To.............: %s\n", tx.To())
 		switch {
@@ -136,3 +137,16 @@ func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip bool) bind
 type nopWriterCloser struct{ io.Writer }
 
 func (nopWriterCloser) Close() error { return nil }
+
+func txType(t uint8) string {
+	switch t {
+	case types.LegacyTxType:
+		return "Legacy"
+	case types.AccessListTxType:
+		return "AccessList"
+	case types.DynamicFeeTxType:
+		return "Dynamic"
+	default:
+		return "Unknown"
+	}
+}
