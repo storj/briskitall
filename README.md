@@ -19,6 +19,7 @@ Available commands:
     briskitall query token allowance                 Retrieves the token allowance of an address
     briskitall query token balance                   Retrieves the token balance of an address
     briskitall query token upgrade-master            Retrieves the token upgrade master
+    briskitall query usb-wallet account list         List all USB wallet accounts
     briskitall submit eth transfer                   Submit a transaction to transfer ETH
     briskitall submit multisig requirement change    Submit a transaction to change the confirmation requirement
     briskitall submit multisig owner add             Submit a transaction to add an owner
@@ -34,6 +35,7 @@ Available commands:
     briskitall revoke                                Revoke confirmation on a pending transaction
     briskitall test deploy multisig                  Deploys the MultiSigWalletWithDailyLimit contract
     briskitall test deploy token                     Deploys the CentrallyIssuedToken contract
+    briskitall test eth transfer                     Transfers ETH
 ```
 
 ## Private Keys

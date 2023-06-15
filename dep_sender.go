@@ -16,6 +16,8 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/zeebo/clingy"
 	"github.com/zeebo/errs"
+
+	"storj.io/briskitall/internal/eth"
 )
 
 var (
@@ -112,16 +114,16 @@ func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip, isUSBWall
 		fmt.Fprintf(out, "  To.............: %s\n", tx.To())
 		switch {
 		case len(tx.Data()) == 0:
-			fmt.Fprintf(out, "  Value..........: %s\n", tx.Value())
+			fmt.Fprintf(out, "  Value..........: %s\n", eth.Pretty(tx.Value()))
 		case call != "":
 			fmt.Fprintf(out, "  Call...........: %s\n", call)
 		default:
 			fmt.Fprintf(out, "  Data...........: %x\n", tx.Data())
 		}
 		fmt.Fprintf(out, "  Gas Estimate...: %d\n", tx.Gas())
-		fmt.Fprintf(out, "  Gas Price......: %s\n", tx.GasPrice())
-		fmt.Fprintf(out, "  Gas Tip Cap....: %s\n", tx.GasTipCap())
-		fmt.Fprintf(out, "  Gas Fee Cap....: %s\n", tx.GasFeeCap())
+		fmt.Fprintf(out, "  Gas Price......: %s\n", eth.Pretty(tx.GasPrice()))
+		fmt.Fprintf(out, "  Gas Tip Cap....: %s\n", eth.Pretty(tx.GasTipCap()))
+		fmt.Fprintf(out, "  Gas Fee Cap....: %s\n", eth.Pretty(tx.GasFeeCap()))
 
 		if !skip {
 			prompt := promptui.Prompt{

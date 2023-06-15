@@ -46,7 +46,7 @@ func commands(cmds clingy.Commands) {
 			cmds.New("balance", "Retrieves the token balance of an address", new(cmdQueryTokenBalance))
 			cmds.New("upgrade-master", "Retrieves the token upgrade master", new(cmdQueryTokenUpgradeMaster))
 		})
-		cmds.Group("usbwallet", "Query the USB wallet", func() {
+		cmds.Group("usb-wallet", "Query the USB wallet", func() {
 			cmds.Group("account", "Query USB wallet accounts", func() {
 				cmds.New("list", "List all USB wallet accounts", new(cmdQueryUSBWalletAccountList))
 			})
