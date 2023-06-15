@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -30,28 +32,44 @@ func (dep *depUSBWalletAccount) setup(params clingy.Parameters) {
 	dep.accountDerivationPath = optionalDerivationPathFlag(params, "usb-wallet-account-derivation-path", "Account derivation path", ethDerivationPath)
 }
 
-func (dep *depUSBWalletAccount) transactOpts(chainID *big.Int) (*bind.TransactOpts, func(), error) {
+func (dep *depUSBWalletAccount) transactOpts(ctx context.Context, chainID *big.Int) (*bind.TransactOpts, func(), error) {
 	wallets, err := enumerateUSBWallets()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Search each wallet for the specified account. Do *NOT* self-derive.
+	var deriveErrs errs.Group
+
+	// Search each wallet for the specified account. Don't self-derive.
 	for _, wallet := range wallets {
 		wallet := wallet
 		wallet.SelfDerive(nil, nil)
 		if err := wallet.Open(""); err != nil {
 			return nil, nil, errs.New("failed to open wallet %s: %v", wallet.URL(), err)
 		}
+		defer func() {
+			if err != nil {
+				_ = wallet.Close()
+			}
+		}()
+
+		status, err := wallet.Status()
+		if err != nil {
+			fmt.Fprintf(clingy.Stderr(ctx), "Failed to determine wallet %q status: %v\n", wallet.URL(), err)
+			continue
+		}
+		fmt.Fprintf(clingy.Stdout(ctx), "%s: status: %s\n", wallet.URL(), status)
+
 		account, err := wallet.Derive(dep.accountDerivationPath, true)
 		if err != nil {
-			_ = wallet.Close()
-			return nil, nil, errs.New("failed to open account %s (%s): %v", wallet.URL(), dep.accountDerivationPath, err)
+			deriveErrs.Add(err)
+			continue
 		}
 		if account.Address != dep.account {
 			continue
 		}
 
+		fmt.Fprintf(clingy.Stdout(ctx), "%s: using account %s (%s)\n", wallet.URL(), account.Address, strings.TrimPrefix(account.URL.String(), wallet.URL().String()))
 		return &bind.TransactOpts{
 				From: account.Address,
 				Signer: func(address common.Address, transaction *types.Transaction) (*types.Transaction, error) {
@@ -66,5 +84,6 @@ func (dep *depUSBWalletAccount) transactOpts(chainID *big.Int) (*bind.TransactOp
 			}, nil
 	}
 
-	return nil, nil, errs.New("no USB wallet account available")
+	deriveErrs.Add(errs.New("no USB wallet account available"))
+	return nil, nil, deriveErrs.Err()
 }

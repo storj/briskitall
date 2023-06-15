@@ -8,7 +8,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -123,7 +122,7 @@ func (h *MultiSigHarness) newTransactor(t *testing.T, key *ecdsa.PrivateKey) *mu
 	opts, err := bind.NewKeyedTransactorWithChainID(key, h.chainID)
 	require.NoError(t, err)
 	waiter := eth.ProgressWaiter(h.client, WaitProgress(t))
-	transactor, err := multisig.NewTransactor(h.client, h.ContractAddress, crypto.PubkeyToAddress(key.PublicKey), opts.Signer, waiter)
+	transactor, err := multisig.NewTransactor(h.client, h.ContractAddress, opts, waiter)
 	require.NoError(t, err)
 	return transactor
 }

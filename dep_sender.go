@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -39,15 +41,17 @@ func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client
 
 	senderChoices := 0
 	eip155Only := false
+	isUSBWallet := false
 
 	if dep.senderKeyFile != "" {
-		eip155Only = false
 		senderChoices++
+		eip155Only = false
 	}
 
 	if dep.usbWallet.enabled() {
-		eip155Only = true
 		senderChoices++
+		eip155Only = true
+		isUSBWallet = true
 	}
 
 	if senderChoices == 0 {
@@ -69,7 +73,7 @@ func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client
 	}
 
 	if dep.usbWallet.enabled() {
-		opts, done, err = dep.usbWallet.transactOpts(dep.chainID)
+		opts, done, err = dep.usbWallet.transactOpts(ctx, dep.chainID)
 		if err != nil {
 			return nil, nil, errs.Wrap(err)
 		}
@@ -90,12 +94,12 @@ func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client
 		}
 	}
 
-	opts.Signer = confirmingSigner(ctx, opts.Signer, dep.skipConfirmation)
+	opts.Signer = confirmingSigner(ctx, opts.Signer, dep.skipConfirmation, isUSBWallet)
 	opts.Context = ctx
 	return opts, done, nil
 }
 
-func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip bool) bind.SignerFn {
+func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip, isUSBWallet bool) bind.SignerFn {
 	return bind.SignerFn(func(sender common.Address, tx *types.Transaction) (*types.Transaction, error) {
 		in := clingy.Stdin(ctx)
 		out := clingy.Stdout(ctx)
@@ -129,6 +133,15 @@ func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip bool) bind
 			if _, err := prompt.Run(); err != nil {
 				return nil, errors.New("aborted")
 			}
+		}
+
+		if isUSBWallet {
+			fmt.Fprintln(out)
+
+			s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(out))
+			s.Prefix = "Waiting for confirmation on the USB wallet "
+			s.Start()
+			defer s.Stop()
 		}
 		return signer(sender, tx)
 	})
