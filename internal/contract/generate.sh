@@ -27,7 +27,7 @@ docker run \
     -o . \
     --combined-json "asm,bin,abi,userdoc,devdoc,metadata" \
     --overwrite \
-    --optimize --optimize-runs 1000000 \
+    --optimize-runs 200 \
     -- \
     "${SOLS[@]}"
 
