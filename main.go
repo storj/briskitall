@@ -29,26 +29,26 @@ func main() {
 func commands(cmds clingy.Commands) {
 	cmds.Group("query", "Query commands", func() {
 		cmds.Group("eth", "Query ETH", func() {
-			cmds.New("balance", "Retrieves the ETH balance of an address", new(cmdQueryETHBalance))
+			cmds.New("balance", "Retrieve the ETH balance of an address", new(cmdQueryETHBalance))
 		})
 		cmds.Group("multisig", "Query the multisig contract", func() {
 			cmds.New("requirement", "Query the multisig contract confirmation requirement", new(cmdQueryMultiSigRequirement))
 			cmds.Group("owner", "Query multisig contract ownership", func() {
-				cmds.New("list", "List owners", new(cmdQueryMultiSigOwnerList))
+				cmds.New("list", "List multisig contract owners", new(cmdQueryMultiSigOwnerList))
 			})
 			cmds.Group("transaction", "Query multisig transactions", func() {
-				cmds.New("list", "Lists the transactions", new(cmdQueryMultiSigTransactionList))
-				cmds.New("status", "Retrieves transaction status", new(cmdQueryMultiSigTransactionStatus))
+				cmds.New("list", "List multisig transactions", new(cmdQueryMultiSigTransactionList))
+				cmds.New("status", "Retrieve multisig transaction status", new(cmdQueryMultiSigTransactionStatus))
 			})
 		})
 		cmds.Group("token", "Query the token contract", func() {
-			cmds.New("allowance", "Retrieves the token allowance of an address", new(cmdQueryTokenAllowance))
-			cmds.New("balance", "Retrieves the token balance of an address", new(cmdQueryTokenBalance))
-			cmds.New("upgrade-master", "Retrieves the token upgrade master", new(cmdQueryTokenUpgradeMaster))
+			cmds.New("allowance", "Retrieve the token allowance of an address", new(cmdQueryTokenAllowance))
+			cmds.New("balance", "Retrieve the token balance of an address", new(cmdQueryTokenBalance))
+			cmds.New("upgrade-master", "Retrieve the token upgrade master", new(cmdQueryTokenUpgradeMaster))
 		})
-		cmds.Group("usb-wallet", "Query the USB wallet", func() {
+		cmds.Group("usb-wallet", "Query USB wallets", func() {
 			cmds.Group("account", "Query USB wallet accounts", func() {
-				cmds.New("list", "List all USB wallet accounts", new(cmdQueryUSBWalletAccountList))
+				cmds.New("list", "List USB wallet accounts", new(cmdQueryUSBWalletAccountList))
 			})
 		})
 	})
@@ -74,7 +74,7 @@ func commands(cmds clingy.Commands) {
 			cmds.New("transfer", "Submit a transaction to transfer tokens", new(cmdSubmitTokenTransfer))
 			cmds.New("transfer-from", "Submit a transaction to transfer tokens based on allowance", new(cmdSubmitTokenTransferFrom))
 		})
-		cmds.New("call", "Submits a transaction to execute a call to an arbitrary contract", new(cmdSubmitContractCall))
+		cmds.New("call", "Submit a transaction to execute a call to an arbitrary contract", new(cmdSubmitContractCall))
 	})
 	cmds.New("confirm", "Confirm a pending transaction", new(cmdConfirm))
 	cmds.New("execute", "Execute a confirmed transaction", new(cmdExecute))
@@ -83,11 +83,11 @@ func commands(cmds clingy.Commands) {
 	cmds.Break()
 	cmds.Group("test", "Run test commands", func() {
 		cmds.Group("deploy", "Submit transaction to the multisig contract", func() {
-			cmds.New("multisig", "Deploys the MultiSigWalletWithDailyLimit contract", new(cmdTestDeployMultiSig))
-			cmds.New("token", "Deploys the CentrallyIssuedToken contract", new(cmdTestDeployToken))
+			cmds.New("multisig", "Deploy the MultiSigWalletWithDailyLimit contract", new(cmdTestDeployMultiSig))
+			cmds.New("token", "Deploy the CentrallyIssuedToken contract", new(cmdTestDeployToken))
 		})
 		cmds.Group("eth", "Convenience ETH commands for testing", func() {
-			cmds.New("transfer", "Transfers ETH", new(cmdTestETHTransfer))
+			cmds.New("transfer", "Transfer ETH", new(cmdTestETHTransfer))
 		})
 	})
 }

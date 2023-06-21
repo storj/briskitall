@@ -11,15 +11,15 @@ We needed a name for a multisig app, and so naturally we opened the Denny's Menu
 ```
 $ briskitall --summary
 Available commands:
-    briskitall query eth balance                     Retrieves the ETH balance of an address
+    briskitall query eth balance                     Retrieve the ETH balance of an address
     briskitall query multisig requirement            Query the multisig contract confirmation requirement
-    briskitall query multisig owner list             List owners
-    briskitall query multisig transaction list       Lists the transactions
-    briskitall query multisig transaction status     Retrieves transaction status
-    briskitall query token allowance                 Retrieves the token allowance of an address
-    briskitall query token balance                   Retrieves the token balance of an address
-    briskitall query token upgrade-master            Retrieves the token upgrade master
-    briskitall query usb-wallet account list         List all USB wallet accounts
+    briskitall query multisig owner list             List multisig contract owners
+    briskitall query multisig transaction list       List multisig transactions
+    briskitall query multisig transaction status     Retrieve multisig transaction status
+    briskitall query token allowance                 Retrieve the token allowance of an address
+    briskitall query token balance                   Retrieve the token balance of an address
+    briskitall query token upgrade-master            Retrieve the token upgrade master
+    briskitall query usb-wallet account list         List USB wallet accounts
     briskitall submit eth transfer                   Submit a transaction to transfer ETH
     briskitall submit multisig requirement change    Submit a transaction to change the confirmation requirement
     briskitall submit multisig owner add             Submit a transaction to add an owner
@@ -29,13 +29,13 @@ Available commands:
     briskitall submit token set-upgrade-master       Submit a transaction to set the upgrade master
     briskitall submit token transfer                 Submit a transaction to transfer tokens
     briskitall submit token transfer-from            Submit a transaction to transfer tokens based on allowance
-    briskitall submit call                           Submits a transaction to execute a call to an arbitrary contract
+    briskitall submit call                           Submit a transaction to execute a call to an arbitrary contract
     briskitall confirm                               Confirm a pending transaction
     briskitall execute                               Execute a confirmed transaction
     briskitall revoke                                Revoke confirmation on a pending transaction
-    briskitall test deploy multisig                  Deploys the MultiSigWalletWithDailyLimit contract
-    briskitall test deploy token                     Deploys the CentrallyIssuedToken contract
-    briskitall test eth transfer                     Transfers ETH
+    briskitall test deploy multisig                  Deploy the MultiSigWalletWithDailyLimit contract
+    briskitall test deploy token                     Deploy the CentrallyIssuedToken contract
+    briskitall test eth transfer                     Transfer ETH
 ```
 
 ## Private Keys
