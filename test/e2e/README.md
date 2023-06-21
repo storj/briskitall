@@ -27,8 +27,7 @@ configuration, including:
 
 1. Bring up geth and the prysm beacon chain and validator.
 
-    $ docker compose up -d
-    ...
+    $ docker-compose up -d
 
 # Playing Around
 
