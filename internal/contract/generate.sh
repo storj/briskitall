@@ -6,7 +6,7 @@ SCRIPTDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 cd "${SCRIPTDIR}"
 
-SOLC_VERSION=0.4.26
+SOLC_VERSION=0.4.19
 ABIGEN_VERSION=$(go list -m all | grep github.com/ethereum/go-ethereum | awk '{print $2}')
 
 SOLS=( MultiSigWalletWithDailyLimit.sol CentrallyIssuedToken.sol )
