@@ -8,6 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
+
+	"storj.io/briskitall/internal/eth"
 )
 
 func int64Arg(params clingy.Parameters, name, desc string) int64 {
@@ -20,6 +22,10 @@ func uint64Arg(params clingy.Parameters, name, desc string) uint64 {
 
 func bigIntArg(params clingy.Parameters, name, desc string) *big.Int {
 	return params.Arg(name, desc, clingy.Transform(transformBigInt)).(*big.Int)
+}
+
+func ethUnitArg(params clingy.Parameters, name, desc string) *big.Int {
+	return params.Arg(name, desc, clingy.Transform(eth.ParseUnit)).(*big.Int)
 }
 
 func stringArg(params clingy.Parameters, name, desc string) string {

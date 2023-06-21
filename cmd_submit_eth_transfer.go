@@ -18,7 +18,7 @@ type cmdSubmitETHTransfer struct {
 func (cmd *cmdSubmitETHTransfer) Setup(params clingy.Parameters) {
 	cmd.transactor.setup(params)
 	cmd.recipient = addressArg(params, "RECIPIENT", "Address to receive ETH")
-	cmd.amount = bigIntArg(params, "AMOUNT", "Amount to transfer (in WEI)")
+	cmd.amount = ethUnitArg(params, "AMOUNT", "Amount to transfer (in ETH/GWEI/WEI)")
 }
 
 func (cmd *cmdSubmitETHTransfer) Execute(ctx context.Context) error {

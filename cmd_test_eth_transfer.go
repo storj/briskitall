@@ -22,7 +22,7 @@ func (cmd *cmdTestETHTransfer) Setup(params clingy.Parameters) {
 	cmd.client.setup(params)
 	cmd.sender.setup(params)
 	cmd.recipient = addressArg(params, "RECIPIENT", "Address to receive ETH")
-	cmd.amount = bigIntArg(params, "AMOUNT", "Amount to transfer (in WEI)")
+	cmd.amount = ethUnitArg(params, "AMOUNT", "Amount to transfer (in ETH/GWEI/WEI)")
 }
 
 func (cmd *cmdTestETHTransfer) Execute(ctx context.Context) error {
