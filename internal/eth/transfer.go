@@ -21,20 +21,13 @@ func Transfer(opts *bind.TransactOpts, client bind.ContractTransactor, recipient
 		return errs.Wrap(err)
 	}
 
-	gasPrice := opts.GasPrice
-	if gasPrice == nil {
-		gasPrice, err = client.SuggestGasPrice(ctx)
-		if err != nil {
-			return errs.Wrap(err)
-		}
-	}
-
-	rawTx := types.NewTx(&types.LegacyTx{
-		To:       &recipient,
-		Nonce:    nonce,
-		GasPrice: gasPrice,
-		Gas:      uint64(21000), // standard gas for transfer
-		Value:    amount,
+	rawTx := types.NewTx(&types.DynamicFeeTx{
+		To:        &recipient,
+		Nonce:     nonce,
+		GasFeeCap: big.NewInt(50000000000), // 50 GWei
+		GasTipCap: big.NewInt(2000000000),  // 2 GWei
+		Gas:       25000,                   // sends to the multisig contract can be 22511
+		Value:     amount,
 	})
 
 	signedTx, err := opts.Signer(opts.From, rawTx)
