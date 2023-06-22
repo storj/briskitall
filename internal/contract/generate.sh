@@ -19,7 +19,7 @@ trap cleanup EXIT
 
 # Generate the combined.json file for all contracts
 docker run \
-    -v .:/wd \
+    -v "$PWD:/wd" \
     -w /wd \
     --user $(id -u):$(id -g) \
     --rm \

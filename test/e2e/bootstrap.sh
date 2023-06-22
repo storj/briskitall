@@ -42,7 +42,7 @@ update_geth_genesis() {
 
 generate_beacon_chain_genesis() {
     dockerrun \
-        --rm -v "./runtime:/runtime" \
+        --rm -v "$PWD/runtime:/runtime" \
         "${PRYSMCTL}" testnet generate-genesis \
             --fork=bellatrix \
             --num-validators=64 \
@@ -60,7 +60,7 @@ generate_beacon_chain_auth_secret() {
 
 init_geth() {
     dockerrun --rm \
-        -v "./runtime:/runtime" \
+        -v "$PWD/runtime:/runtime" \
         "${GETHALLTOOLS}" geth \
             --datadir /runtime/geth \
             init /runtime/geth/genesis.json

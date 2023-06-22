@@ -27,8 +27,7 @@ configuration, including:
 
 1. Bring up geth and the prysm beacon chain and validator.
 
-    $ docker compose up -d
-    ...
+    $ docker-compose up -d
 
 # Playing Around
 
@@ -38,7 +37,7 @@ The `./briskitall.sh` script is a small helper script that wraps execution of `b
 
 First things first, you probably want to deploy the MultiSig contract. The following command will deploy the contract using the root account with account-0 and account-1 as the initial set of owners:
 
-    $ ./briskitall.sh test deploy multisig $(cat ../testdata/account-0.addr) $(cat ../testdata/account-1.addr) --sender $(cat ../testdata/root.addr)
+    $ ./briskitall.sh test deploy multisig $(cat ../testdata/account-0.addr) $(cat ../testdata/account-1.addr) --sender-key-file ../testdata/root.key
     ETH[0x4354d30f214b930e153ddaa6bac05ed210b8fd19e7c5e0abc351be559780bb10]: Sent 📄 
     ETH[0x4354d30f214b930e153ddaa6bac05ed210b8fd19e7c5e0abc351be559780bb10]: Confirmed ✅ 
     MultiSig contract address: 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
