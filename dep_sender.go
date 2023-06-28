@@ -28,6 +28,7 @@ type depSender struct {
 	usbWallet        depUSBWalletAccount
 	senderKeyFile    string
 	chainID          *big.Int
+	gasLimit         uint64
 	skipConfirmation bool
 }
 
@@ -36,6 +37,7 @@ func (dep *depSender) setup(params clingy.Parameters) {
 	dep.senderKeyFile = optionalStringEnvFlag(params, "sender-key-file", "Path on disk to the sender private key", "", envSenderKeyFile)
 	dep.chainID = optionalBigIntEnvFlag(params, "chain-id", "Chain ID", defChainID, envChainID)
 	dep.skipConfirmation = boolEnvFlag(params, "skip-confirmation", "Skips confirmation before transacting", envSkipConfirmation)
+	dep.gasLimit = uint64Flag(params, "gas-limit", "Sets the transaction gas limit (0 = estimate)", 0)
 }
 
 func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client) (opts *bind.TransactOpts, done func(), err error) {
@@ -97,6 +99,7 @@ func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client
 	}
 
 	opts.Signer = confirmingSigner(ctx, opts.Signer, dep.skipConfirmation, isUSBWallet)
+	opts.GasLimit = dep.gasLimit
 	opts.Context = ctx
 	return opts, done, nil
 }
@@ -120,7 +123,7 @@ func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip, isUSBWall
 		default:
 			fmt.Fprintf(out, "  Data...........: %x\n", tx.Data())
 		}
-		fmt.Fprintf(out, "  Gas Estimate...: %d\n", tx.Gas())
+		fmt.Fprintf(out, "  Gas Limit......: %d\n", tx.Gas())
 		fmt.Fprintf(out, "  Gas Price......: %s\n", eth.Pretty(tx.GasPrice()))
 		fmt.Fprintf(out, "  Gas Tip Cap....: %s\n", eth.Pretty(tx.GasTipCap()))
 		fmt.Fprintf(out, "  Gas Fee Cap....: %s\n", eth.Pretty(tx.GasFeeCap()))

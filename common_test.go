@@ -54,5 +54,8 @@ func runCmd(t *testing.T, harness *test.Harness, rawArgs ...interface{}) (*bytes
 	ok, err := env.Run(context.Background(), commands)
 	require.True(t, ok, "command dispatch failed: %s", stdout.String())
 
+	t.Logf("stdout=%s", stdout.String())
+	t.Logf("stderr=%s", stderr.String())
+
 	return stdout, stderr, err
 }

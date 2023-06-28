@@ -68,6 +68,10 @@ func int64Flag(params clingy.Parameters, name, desc string, def int64) int64 {
 	return params.Flag(name, desc, def, clingy.Transform(transformInt64)).(int64)
 }
 
+func uint64Flag(params clingy.Parameters, name, desc string, def uint64) uint64 {
+	return params.Flag(name, desc, def, clingy.Transform(transformUint64)).(uint64)
+}
+
 func bigIntFlag(params clingy.Parameters, name, desc string, def *big.Int) *big.Int {
 	return params.Flag(name, desc, def, clingy.Transform(transformBigInt)).(*big.Int)
 }
