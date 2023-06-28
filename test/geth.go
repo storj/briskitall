@@ -15,13 +15,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/require"
+
+	"storj.io/briskitall/internal/eth"
 )
 
 type geth struct {
 	NodeURL        string
-	Client         *ethclient.Client
+	Client         eth.Client
 	ChainID        *big.Int
 	RootTransactor *bind.TransactOpts
 
@@ -70,7 +71,7 @@ func runGeth(t *testing.T) *geth {
 	t.Logf("Ephemeral local port for container %q: %s", containerName, port)
 	url := "http://localhost:" + port
 
-	client, err := ethclient.Dial(url)
+	client, err := eth.Dial(context.Background(), url)
 	require.NoError(t, err)
 	t.Cleanup(client.Close)
 

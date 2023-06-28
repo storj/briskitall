@@ -8,7 +8,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -26,7 +25,7 @@ type TokenHarness struct {
 	Caller          *token.Caller
 
 	chainID *big.Int
-	client  *ethclient.Client
+	client  eth.Client
 }
 
 func (h *TokenHarness) AssertBalance(t *testing.T, account common.Address, expected string) {
@@ -81,7 +80,7 @@ func (h *TokenHarness) waitForTransaction(t *testing.T, hash common.Hash) {
 }
 
 // deployTokenContract deploys the token contract with the multisig contract as the owner.
-func deployTokenContract(t *testing.T, opts *bind.TransactOpts, client *ethclient.Client, multiSigContractAddress common.Address) common.Address {
+func deployTokenContract(t *testing.T, opts *bind.TransactOpts, client eth.Client, multiSigContractAddress common.Address) common.Address {
 	decimals := int64(8)
 	waiter := eth.ProgressWaiter(client, WaitProgress(t))
 

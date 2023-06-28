@@ -72,6 +72,10 @@ func uint64Flag(params clingy.Parameters, name, desc string, def uint64) uint64 
 	return params.Flag(name, desc, def, clingy.Transform(transformUint64)).(uint64)
 }
 
+func float64Flag(params clingy.Parameters, name, desc string, def float64) float64 {
+	return params.Flag(name, desc, def, clingy.Transform(transformFloat64)).(float64)
+}
+
 func bigIntFlag(params clingy.Parameters, name, desc string, def *big.Int) *big.Int {
 	return params.Flag(name, desc, def, clingy.Transform(transformBigInt)).(*big.Int)
 }
@@ -110,6 +114,10 @@ func transformInt64(s string) (int64, error) {
 
 func transformUint64(s string) (uint64, error) {
 	return strconv.ParseUint(s, 10, 64)
+}
+
+func transformFloat64(s string) (float64, error) {
+	return strconv.ParseFloat(s, 64)
 }
 
 func transformAddress(s string) (common.Address, error) {

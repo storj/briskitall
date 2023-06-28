@@ -12,7 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/manifoldco/promptui"
 	"github.com/zeebo/clingy"
 	"github.com/zeebo/errs"
@@ -40,7 +39,7 @@ func (dep *depSender) setup(params clingy.Parameters) {
 	dep.gasLimit = uint64Flag(params, "gas-limit", "Sets the transaction gas limit (0 = estimate)", 0)
 }
 
-func (dep *depSender) transactOpts(ctx context.Context, client *ethclient.Client) (opts *bind.TransactOpts, done func(), err error) {
+func (dep *depSender) transactOpts(ctx context.Context, client bind.ContractTransactor) (opts *bind.TransactOpts, done func(), err error) {
 	done = func() {}
 
 	senderChoices := 0

@@ -8,7 +8,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -22,7 +21,7 @@ type MultiSigHarness struct {
 
 	nodeURL              string
 	chainID              *big.Int
-	client               *ethclient.Client
+	client               eth.Client
 	tokenContractAddress common.Address
 }
 
@@ -127,7 +126,7 @@ func (h *MultiSigHarness) newTransactor(t *testing.T, key *ecdsa.PrivateKey) *mu
 	return transactor
 }
 
-func deployMultiSigContract(t *testing.T, opts *bind.TransactOpts, client *ethclient.Client) common.Address {
+func deployMultiSigContract(t *testing.T, opts *bind.TransactOpts, client eth.Client) common.Address {
 	owners := AccountAddress[0:2]
 	required := int64(2)
 	dailyLimit := int64(0)

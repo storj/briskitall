@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -13,7 +12,7 @@ import (
 )
 
 type ETHHarness struct {
-	client *ethclient.Client
+	client eth.Client
 }
 
 func (h *ETHHarness) AssertBalance(t *testing.T, account common.Address, expected string) {
