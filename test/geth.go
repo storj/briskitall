@@ -52,7 +52,7 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 
 	cmds = append(cmds,
 		"miner.start",
-		"admin.sleepBlocks(1)",
+		//"admin.sleepBlocks(1)",
 	)
 
 	scriptCmd := exec.Command("docker", "exec", g.containerName,
