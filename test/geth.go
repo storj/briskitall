@@ -51,7 +51,7 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 
 	script := new(strings.Builder)
 	for _, address := range addresses {
-		fmt.Fprintf(script, `eth.getTransactionReceipt(eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")}));`, address)
+		fmt.Fprintf(script, `eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")});`, address)
 	}
 
 	scriptCmd := exec.Command("docker", "exec", g.containerName,
@@ -60,7 +60,6 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 		"--exec",
 		script.String(),
 	)
-	t.Logf("Fund: args=%q", scriptCmd.Args)
 	scriptCmd.Stdout = out
 	scriptCmd.Stderr = out
 	err := scriptCmd.Run()
