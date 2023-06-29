@@ -29,8 +29,18 @@ type geth struct {
 	containerName string
 }
 
+type testLogOut struct {
+	t *testing.T
+}
+
+func (o *testLogOut) Write(b []byte) (int, error) {
+	o.t.Logf("%s", string(b))
+	return len(b), nil
+}
+
 // fund uses the geth JS console to fund addresses with 10 ETH each
 func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
+	out := &testLogOut{t}
 	cmds := []string{
 		"miner.stop",
 	}
@@ -50,8 +60,11 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 		"--exec",
 		strings.Join(cmds, ";"),
 	)
-	output, err := scriptCmd.CombinedOutput()
-	require.NoError(t, err, "failed to fund %s:\n%s", addresses, string(output))
+	t.Logf("Fund: args=%q", scriptCmd.Args)
+	scriptCmd.Stdout = out
+	scriptCmd.Stderr = out
+	err := scriptCmd.Run()
+	require.NoError(t, err, "failed to fund %q", addresses)
 }
 
 // runGeth starts geth in a docker container with a random ID. The geth RPC port
