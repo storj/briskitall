@@ -20,14 +20,9 @@ import (
 	"storj.io/briskitall/internal/eth"
 )
 
-type geth struct {
-	NodeURL        string
-	Client         eth.Client
-	ChainID        *big.Int
-	RootTransactor *bind.TransactOpts
-
-	containerName string
-}
+var (
+	logGethOutput = os.Getenv("BRISKITALL_TEST_LOG_GETH_OUTPUT") == "true"
+)
 
 type testLogOut struct {
 	t      *testing.T
@@ -35,8 +30,19 @@ type testLogOut struct {
 }
 
 func (o *testLogOut) Write(b []byte) (int, error) {
-	o.t.Logf("[%s]: %s", o.prefix, string(b))
+	if logGethOutput {
+		o.t.Logf("[%s]: %s", o.prefix, string(b))
+	}
 	return len(b), nil
+}
+
+type geth struct {
+	NodeURL        string
+	Client         eth.Client
+	ChainID        *big.Int
+	RootTransactor *bind.TransactOpts
+
+	containerName string
 }
 
 // fund uses the geth JS console to fund addresses with 10 ETH each
