@@ -31,6 +31,7 @@ func runCmd(t *testing.T, harness *test.Harness, rawArgs ...interface{}) (string
 		args[i] = fmt.Sprint(arg)
 	}
 
+	t.Logf("cmd=%q", args)
 	env := clingy.Environment{
 		Stdout: stdoutBuf,
 		Stderr: stderrBuf,

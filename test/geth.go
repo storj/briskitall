@@ -20,6 +20,22 @@ import (
 	"storj.io/briskitall/internal/eth"
 )
 
+var (
+	logGethOutput = os.Getenv("BRISKITALL_TEST_LOG_GETH_OUTPUT") == "true"
+)
+
+type testLogOut struct {
+	t      *testing.T
+	prefix string
+}
+
+func (o *testLogOut) Write(b []byte) (int, error) {
+	if logGethOutput {
+		o.t.Logf("[%s]: %s", o.prefix, string(b))
+	}
+	return len(b), nil
+}
+
 type geth struct {
 	NodeURL        string
 	Client         eth.Client
@@ -31,27 +47,23 @@ type geth struct {
 
 // fund uses the geth JS console to fund addresses with 10 ETH each
 func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
-	cmds := []string{
-		"miner.stop",
-	}
+	out := &testLogOut{t: t, prefix: "fund"}
 
+	script := new(strings.Builder)
 	for _, address := range addresses {
-		cmds = append(cmds, fmt.Sprintf(`eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")})`, address))
+		fmt.Fprintf(script, `eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")});`, address)
 	}
-
-	cmds = append(cmds,
-		"miner.start",
-		"admin.sleepBlocks(1)",
-	)
 
 	scriptCmd := exec.Command("docker", "exec", g.containerName,
 		"geth", "attach",
 		"--datadir", ".",
 		"--exec",
-		strings.Join(cmds, ";"),
+		script.String(),
 	)
-	output, err := scriptCmd.CombinedOutput()
-	require.NoError(t, err, "failed to fund %s:\n%s", addresses, string(output))
+	scriptCmd.Stdout = out
+	scriptCmd.Stderr = out
+	err := scriptCmd.Run()
+	require.NoError(t, err, "failed to fund %q", addresses)
 }
 
 // runGeth starts geth in a docker container with a random ID. The geth RPC port
@@ -100,14 +112,16 @@ func runGeth(t *testing.T) *geth {
 func startContainer(t *testing.T, containerName string) {
 	runCmd := exec.Command("docker", "run",
 		// docker flags
-		"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go",
+		"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go:v1.12.0",
 		// geth flags
 		"--dev", "--datadir", ".", "--http", "--http.addr", "0.0.0.0", "--http.api", "eth,web3,net,debug")
 	err := runCmd.Run()
 	require.NoError(t, err, "failed to start geth container")
 	t.Cleanup(func() {
-		require.NoError(t, exec.Command("docker", "stop", containerName, "-s", "kill").Run())
+		_ = exec.Command("docker", "stop", containerName, "-s", "kill").Run()
 	})
+
+	startDockerLogs(t, containerName)
 }
 
 func getLocalPort(t *testing.T, containerName string) string {
@@ -124,4 +138,14 @@ func getLocalPort(t *testing.T, containerName string) string {
 	_, port, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
 	require.True(t, found, "found port")
 	return port
+}
+
+func startDockerLogs(t *testing.T, containerName string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	out := &testLogOut{t: t, prefix: "geth"}
+	runCmd := exec.CommandContext(ctx, "docker", "logs", "-f", containerName)
+	runCmd.Stdout = out
+	runCmd.Stderr = out
+	runCmd.Start()
 }
