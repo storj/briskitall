@@ -91,7 +91,7 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 			return 0, errors.New("transaction failed")
 		case err == ethereum.NotFound:
 		default:
-			progress.TempError(fmt.Errorf("failed to query for transaction receipt: %+v\n", err))
+			progress.TempError(fmt.Errorf("failed to query for transaction receipt: %+v", err))
 		}
 
 		_, _, err = backend.TransactionByHash(ctx, hash)
@@ -101,7 +101,7 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 			progress.Dropped()
 			return 0, errors.New("transaction dropped")
 		default:
-			progress.TempError(fmt.Errorf("failed to query for transaction by hash: %+v\n", err))
+			progress.TempError(fmt.Errorf("failed to query for transaction by hash: %+v", err))
 		}
 	}
 }

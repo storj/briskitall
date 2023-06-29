@@ -93,14 +93,6 @@ func isExecutionReverted(err error) bool {
 	return false
 }
 
-func defaultCallOpts(ctx context.Context) *bind.CallOpts {
-	return &bind.CallOpts{Context: ctx}
-}
-
-func defaultTransactOpts(ctx context.Context) *bind.TransactOpts {
-	return &bind.TransactOpts{Context: ctx}
-}
-
 func newUint64(u uint64) *big.Int {
 	return new(big.Int).SetUint64(u)
 }
