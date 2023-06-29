@@ -26,4 +26,4 @@ jobs:
         # The test keys need to be 0600 to be loaded
         chmod 0600 test/testdata/account-*.key
         # Run tests
-        go test -v -run ConfirmCmd
+        go test -v ./...
