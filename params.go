@@ -12,6 +12,7 @@ import (
 	"storj.io/briskitall/internal/eth"
 )
 
+//lint:ignore U1000, utility func that is fine to be unused
 func int64Arg(params clingy.Parameters, name, desc string) int64 {
 	return params.Arg(name, desc, clingy.Transform(transformInt64)).(int64)
 }
@@ -40,6 +41,7 @@ func addressArg(params clingy.Parameters, name, desc string) common.Address {
 	return params.Arg(name, desc, clingy.Transform(transformAddress)).(common.Address)
 }
 
+//lint:ignore U1000, utility func that is fine to be unused
 func optAddressArg(params clingy.Parameters, name, desc string) *common.Address {
 	return params.Arg(name, desc, clingy.Optional, clingy.Transform(transformAddress)).(*common.Address)
 }
@@ -100,6 +102,7 @@ func optionalBigIntEnvFlag(params clingy.Parameters, name, desc string, def *big
 	return params.Flag(name, desc, def, clingy.Getenv(env), clingy.Transform(transformBigInt)).(*big.Int)
 }
 
+//lint:ignore U1000, utility func that is fine to be unused
 func requiredBigIntEnvFlag(params clingy.Parameters, name, desc string, env string) *big.Int {
 	return params.Flag(name, desc, clingy.Required, clingy.Getenv(env), clingy.Transform(transformBigInt)).(*big.Int)
 }

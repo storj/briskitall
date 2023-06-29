@@ -19,11 +19,16 @@ jobs:
         go-version: '1.20'
 
     - name: Build
-      run: go build -v ./...
+      run: go build -race -v ./...
 
     - name: Test
       run: |
         # The test keys need to be 0600 to be loaded
         chmod 0600 test/testdata/account-*.key
         # Run tests
-        go test -v ./...
+        go test -race -v ./...
+
+    - name: "Staticcheck"
+      uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        version: "2023.1.3"
