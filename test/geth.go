@@ -114,7 +114,7 @@ func runGeth(t *testing.T) *geth {
 func startContainer(t *testing.T, containerName string) {
 	runCmd := exec.Command("docker", "run",
 		// docker flags
-		"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go",
+		"-d", "--rm", "--name", containerName, "-p", ":8545", "ethereum/client-go:v1.12.0",
 		// geth flags
 		"--dev", "--datadir", ".", "--http", "--http.addr", "0.0.0.0", "--http.api", "eth,web3,net,debug")
 	err := runCmd.Run()
