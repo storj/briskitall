@@ -42,24 +42,20 @@ func (o *testLogOut) Write(b []byte) (int, error) {
 // fund uses the geth JS console to fund addresses with 10 ETH each
 func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 	out := &testLogOut{t: t, prefix: "fund"}
-	cmds := []string{
-		"miner.stop",
-	}
+
+	script := new(strings.Builder)
+	script.WriteString(`miner.stop; web3.eth.getBlockNumber((n) => {`)
 
 	for _, address := range addresses {
-		cmds = append(cmds, fmt.Sprintf(`eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")})`, address))
+		fmt.Fprintf(script, `eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")});`, address)
 	}
-
-	cmds = append(cmds,
-		"miner.start",
-		//"admin.sleepBlocks(1)",
-	)
+	script.WriteString("miner.start;admin.sleepBlocks(n+1)})")
 
 	scriptCmd := exec.Command("docker", "exec", g.containerName,
 		"geth", "attach",
 		"--datadir", ".",
 		"--exec",
-		strings.Join(cmds, ";"),
+		script.String(),
 	)
 	t.Logf("Fund: args=%q", scriptCmd.Args)
 	scriptCmd.Stdout = out
@@ -120,7 +116,7 @@ func startContainer(t *testing.T, containerName string) {
 	err := runCmd.Run()
 	require.NoError(t, err, "failed to start geth container")
 	t.Cleanup(func() {
-		require.NoError(t, exec.Command("docker", "stop", containerName, "-s", "kill").Run())
+		_ = exec.Command("docker", "stop", containerName, "-s", "kill").Run()
 	})
 
 	startDockerLogs(t, containerName)
