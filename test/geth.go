@@ -44,12 +44,9 @@ func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
 	out := &testLogOut{t: t, prefix: "fund"}
 
 	script := new(strings.Builder)
-	script.WriteString(`miner.stop; web3.eth.getBlockNumber((n) => {`)
-
 	for _, address := range addresses {
-		fmt.Fprintf(script, `eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")});`, address)
+		fmt.Fprintf(script, `eth.getTransactionReceipt(eth.sendTransaction({from: eth.accounts[0], to: %q, value: web3.toWei(10, "ether")}));`, address)
 	}
-	script.WriteString("miner.start;admin.sleepBlocks(n+1)})")
 
 	scriptCmd := exec.Command("docker", "exec", g.containerName,
 		"geth", "attach",
