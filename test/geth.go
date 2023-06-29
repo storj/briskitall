@@ -30,17 +30,18 @@ type geth struct {
 }
 
 type testLogOut struct {
-	t *testing.T
+	t      *testing.T
+	prefix string
 }
 
 func (o *testLogOut) Write(b []byte) (int, error) {
-	o.t.Logf("%s", string(b))
+	o.t.Logf("[%s]: %s", o.prefix, string(b))
 	return len(b), nil
 }
 
 // fund uses the geth JS console to fund addresses with 10 ETH each
 func (g *geth) Fund(t *testing.T, addresses ...common.Address) {
-	out := &testLogOut{t}
+	out := &testLogOut{t: t, prefix: "fund"}
 	cmds := []string{
 		"miner.stop",
 	}
@@ -121,6 +122,8 @@ func startContainer(t *testing.T, containerName string) {
 	t.Cleanup(func() {
 		require.NoError(t, exec.Command("docker", "stop", containerName, "-s", "kill").Run())
 	})
+
+	startDockerLogs(t, containerName)
 }
 
 func getLocalPort(t *testing.T, containerName string) string {
@@ -137,4 +140,14 @@ func getLocalPort(t *testing.T, containerName string) string {
 	_, port, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
 	require.True(t, found, "found port")
 	return port
+}
+
+func startDockerLogs(t *testing.T, containerName string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	out := &testLogOut{t: t, prefix: "geth"}
+	runCmd := exec.CommandContext(ctx, "docker", "logs", "-f", containerName)
+	runCmd.Stdout = out
+	runCmd.Stderr = out
+	runCmd.Start()
 }
