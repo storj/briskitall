@@ -10,10 +10,10 @@ import (
 type cmdQueryMultiSigTransactionList struct {
 	caller           depMultiSigCaller
 	skipZeroConfirms bool
-	tail     int
-	pending  bool
-	executed bool
-	status   bool
+	tail             int
+	pending          bool
+	executed         bool
+	status           bool
 }
 
 func (cmd *cmdQueryMultiSigTransactionList) Setup(params clingy.Parameters) {
@@ -38,11 +38,9 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 
 	needsSeparator := false
 
-	if cmd.tail > 0 && len(transactionIDs) > cmd.tail {
-		transactionIDs = transactionIDs[len(transactionIDs)-cmd.tail:]
-	}
-
-	for _, transactionID := range transactionIDs {
+	var transactionIDsToShow []uint64
+	for i := len(transactionIDs) - 1; i >= 0; i-- {
+		transactionID := transactionIDs[i]
 		if cmd.skipZeroConfirms {
 			confirmations, err := caller.GetTransactionConfirmations(ctx, transactionID)
 			if err != nil {
@@ -52,6 +50,14 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 				continue
 			}
 		}
+		transactionIDsToShow = append(transactionIDsToShow, transactionID)
+		if cmd.tail > 0 && len(transactionIDsToShow) >= cmd.tail {
+			break
+		}
+	}
+
+	for i := len(transactionIDsToShow) - 1; i >= 0; i-- {
+		transactionID := transactionIDsToShow[i]
 
 		if !cmd.status {
 			fmt.Fprintln(clingy.Stdout(ctx), transactionID)
