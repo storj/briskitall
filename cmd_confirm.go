@@ -18,7 +18,7 @@ func (cmd *cmdConfirm) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdConfirm) Execute(ctx context.Context) error {
-	transactor, done, err := cmd.transactor.open(ctx)
+	client, transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
@@ -29,6 +29,6 @@ func (cmd *cmdConfirm) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	printTransactionStatus(ctx, transactor.Caller, cmd.transactionID)
+	printTransactionStatus(ctx, client, transactor.Caller, cmd.transactionID)
 	return nil
 }

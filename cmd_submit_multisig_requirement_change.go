@@ -18,7 +18,7 @@ func (cmd *cmdSubmitMultisigRequirementChange) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdSubmitMultisigRequirementChange) Execute(ctx context.Context) error {
-	transactor, done, err := cmd.transactor.open(ctx)
+	client, transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
@@ -30,5 +30,5 @@ func (cmd *cmdSubmitMultisigRequirementChange) Execute(ctx context.Context) erro
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, transactor.Caller, transactionID)
+	return printTransactionStatus(ctx, client, transactor.Caller, transactionID)
 }

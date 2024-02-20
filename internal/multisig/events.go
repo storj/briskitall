@@ -14,7 +14,7 @@ import (
 type Event interface {
 	String() string
 
-	blockNumber() uint64
+	BlockNumber() uint64
 }
 
 type confirmationEvent contract.MultiSigWalletConfirmation
@@ -23,7 +23,7 @@ func (e *confirmationEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Confirmation(%s)", e.Raw.TxHash, e.Sender)
 }
 
-func (e *confirmationEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *confirmationEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type revocationEvent contract.MultiSigWalletRevocation
 
@@ -31,7 +31,7 @@ func (e *revocationEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Revocation(%s)", e.Raw.TxHash, e.Sender)
 }
 
-func (e *revocationEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *revocationEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type submissionEvent contract.MultiSigWalletSubmission
 
@@ -39,7 +39,7 @@ func (e *submissionEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Submission()", e.Raw.TxHash)
 }
 
-func (e *submissionEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *submissionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type executionEvent contract.MultiSigWalletExecution
 
@@ -47,7 +47,7 @@ func (e *executionEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Execution()", e.Raw.TxHash)
 }
 
-func (e *executionEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *executionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type executionFailureEvent contract.MultiSigWalletExecutionFailure
 
@@ -55,7 +55,7 @@ func (e *executionFailureEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: ExecutionFailure()", e.Raw.TxHash)
 }
 
-func (e *executionFailureEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *executionFailureEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type depositEvent contract.MultiSigWalletDeposit
 
@@ -63,7 +63,7 @@ func (e *depositEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Deposit(%s, %s)", e.Raw.TxHash, e.Sender, e.Value)
 }
 
-func (e *depositEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *depositEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type ownerAdditionEvent contract.MultiSigWalletOwnerAddition
 
@@ -71,7 +71,7 @@ func (e *ownerAdditionEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: OwnerAddition(%s)", e.Raw.TxHash, e.Owner)
 }
 
-func (e *ownerAdditionEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *ownerAdditionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type ownerRemovalEvent contract.MultiSigWalletOwnerRemoval
 
@@ -79,7 +79,7 @@ func (e *ownerRemovalEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: OwnerRemoval(%s)", e.Raw.TxHash, e.Owner)
 }
 
-func (e *ownerRemovalEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *ownerRemovalEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type requirementChangeEvent contract.MultiSigWalletRequirementChange
 
@@ -87,7 +87,7 @@ func (e *requirementChangeEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: RequirementChanged(%s)", e.Raw.TxHash, e.Required)
 }
 
-func (e *requirementChangeEvent) blockNumber() uint64 { return e.Raw.BlockNumber }
+func (e *requirementChangeEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 func getAllEvents(opts *bind.FilterOpts, filterer *contract.MultiSigWalletWithDailyLimitFilterer) ([]Event, error) {
 	events, err := getTransactionEvents(opts, filterer, nil)
@@ -222,6 +222,6 @@ func getTransactionEvents(opts *bind.FilterOpts, filterer *contract.MultiSigWall
 
 func sortEvents(events []Event) {
 	sort.Slice(events, func(i, j int) bool {
-		return events[i].blockNumber() < events[j].blockNumber()
+		return events[i].BlockNumber() < events[j].BlockNumber()
 	})
 }

@@ -16,7 +16,7 @@ func (cmd *cmdQueryMultiSigOwnerList) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdQueryMultiSigOwnerList) Execute(ctx context.Context) error {
-	caller, err := cmd.caller.open(ctx)
+	_, caller, err := cmd.caller.open(ctx)
 	if err != nil {
 		return err
 	}

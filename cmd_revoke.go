@@ -18,7 +18,7 @@ func (cmd *cmdRevoke) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdRevoke) Execute(ctx context.Context) error {
-	transactor, done, err := cmd.transactor.open(ctx)
+	client, transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
@@ -29,5 +29,5 @@ func (cmd *cmdRevoke) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, transactor.Caller, cmd.transactionID)
+	return printTransactionStatus(ctx, client, transactor.Caller, cmd.transactionID)
 }

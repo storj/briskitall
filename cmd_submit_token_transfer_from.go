@@ -26,7 +26,7 @@ func (cmd *cmdSubmitTokenTransferFrom) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdSubmitTokenTransferFrom) Execute(ctx context.Context) error {
-	transactor, done, err := cmd.transactor.open(ctx)
+	client, transactor, done, err := cmd.transactor.open(ctx)
 	if err != nil {
 		return err
 	}
@@ -38,5 +38,5 @@ func (cmd *cmdSubmitTokenTransferFrom) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, transactor.Caller, transactionID)
+	return printTransactionStatus(ctx, client, transactor.Caller, transactionID)
 }
