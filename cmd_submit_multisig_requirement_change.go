@@ -30,5 +30,5 @@ func (cmd *cmdSubmitMultisigRequirementChange) Execute(ctx context.Context) erro
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, client, transactor.Caller, transactionID)
+	return printTransactionStatus(ctx, client, cmd.transactor.client.nicknames, transactor.Caller, transactionID)
 }

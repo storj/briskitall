@@ -29,6 +29,6 @@ func (cmd *cmdConfirm) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	printTransactionStatus(ctx, client, transactor.Caller, cmd.transactionID)
+	printTransactionStatus(ctx, client, cmd.transactor.client.nicknames, transactor.Caller, cmd.transactionID)
 	return nil
 }

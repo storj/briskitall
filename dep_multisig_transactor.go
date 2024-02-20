@@ -27,7 +27,7 @@ func (dep *depMultiSigTransactor) open(ctx context.Context) (eth.Client, *multis
 		return nil, nil, nil, err
 	}
 
-	opts, done, err := dep.sender.transactOpts(ctx, client)
+	opts, done, err := dep.sender.transactOpts(ctx, dep.client.nicknames, client)
 	if err != nil {
 		return nil, nil, nil, err
 	}

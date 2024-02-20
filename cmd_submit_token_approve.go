@@ -36,5 +36,5 @@ func (cmd *cmdSubmitTokenApprove) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, client, transactor.Caller, transactionID)
+	return printTransactionStatus(ctx, client, cmd.transactor.client.nicknames, transactor.Caller, transactionID)
 }

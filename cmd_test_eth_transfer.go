@@ -30,7 +30,7 @@ func (cmd *cmdTestETHTransfer) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	opts, done, err := cmd.sender.transactOpts(ctx, client)
+	opts, done, err := cmd.sender.transactOpts(ctx, cmd.client.nicknames, client)
 	if err != nil {
 		return err
 	}

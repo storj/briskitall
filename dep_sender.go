@@ -17,6 +17,7 @@ import (
 	"github.com/zeebo/errs"
 
 	"storj.io/briskitall/internal/eth"
+	"storj.io/briskitall/internal/multisig"
 )
 
 var (
@@ -39,7 +40,7 @@ func (dep *depSender) setup(params clingy.Parameters) {
 	dep.gasLimit = uint64Flag(params, "gas-limit", "Sets the transaction gas limit (0 = estimate)", 0)
 }
 
-func (dep *depSender) transactOpts(ctx context.Context, client bind.ContractTransactor) (opts *bind.TransactOpts, done func(), err error) {
+func (dep *depSender) transactOpts(ctx context.Context, nicknames multisig.Nicknames, client bind.ContractTransactor) (opts *bind.TransactOpts, done func(), err error) {
 	done = func() {}
 
 	senderChoices := 0
@@ -97,23 +98,27 @@ func (dep *depSender) transactOpts(ctx context.Context, client bind.ContractTran
 		}
 	}
 
-	opts.Signer = confirmingSigner(ctx, opts.Signer, dep.skipConfirmation, isUSBWallet)
+	opts.Signer = confirmingSigner(ctx, nicknames, opts.Signer, dep.skipConfirmation, isUSBWallet)
 	opts.GasLimit = dep.gasLimit
 	opts.Context = ctx
 	return opts, done, nil
 }
 
-func confirmingSigner(ctx context.Context, signer bind.SignerFn, skip, isUSBWallet bool) bind.SignerFn {
+func confirmingSigner(ctx context.Context, nicknames multisig.Nicknames, signer bind.SignerFn, skip, isUSBWallet bool) bind.SignerFn {
 	return bind.SignerFn(func(sender common.Address, tx *types.Transaction) (*types.Transaction, error) {
 		in := clingy.Stdin(ctx)
 		out := clingy.Stdout(ctx)
 
-		call := tryDecodeCall(tx.Data())
+		call := tryDecodeCall(nicknames, tx.Data())
 
 		fmt.Fprintf(out, "Preparing to send transaction:\n")
 		fmt.Fprintf(out, "  Type...........: %s\n", txType(tx.Type()))
-		fmt.Fprintf(out, "  From...........: %s\n", sender)
-		fmt.Fprintf(out, "  To.............: %s\n", tx.To())
+		fmt.Fprintf(out, "  From...........: %s\n", nicknames.Lookup(sender))
+		to := ""
+		if txTo := tx.To(); txTo != nil {
+			to = nicknames.Lookup(*txTo)
+		}
+		fmt.Fprintf(out, "  To.............: %s\n", to)
 		switch {
 		case len(tx.Data()) == 0:
 			fmt.Fprintf(out, "  Value..........: %s\n", eth.Pretty(tx.Value()))

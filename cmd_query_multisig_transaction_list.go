@@ -51,7 +51,7 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 		if needsSeparator {
 			fmt.Fprintln(clingy.Stdout(ctx))
 		}
-		if err := printTransactionStatus(ctx, client, caller, transactionID); err != nil {
+		if err := printTransactionStatus(ctx, client, cmd.caller.client.nicknames, caller, transactionID); err != nil {
 			return err
 		}
 		needsSeparator = true

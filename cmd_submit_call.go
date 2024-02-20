@@ -57,7 +57,7 @@ func (cmd *cmdSubmitContractCall) Execute(ctx context.Context) error {
 	}
 
 	fmt.Fprintln(clingy.Stdout(ctx))
-	return printTransactionStatus(ctx, client, transactor.Caller, transactionID)
+	return printTransactionStatus(ctx, client, cmd.transactor.client.nicknames, transactor.Caller, transactionID)
 }
 
 func loadABI(path string) (*abi.ABI, error) {
