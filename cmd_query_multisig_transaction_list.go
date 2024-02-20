@@ -10,14 +10,16 @@ import (
 type cmdQueryMultiSigTransactionList struct {
 	caller           depMultiSigCaller
 	skipZeroConfirms bool
-	pending          bool
-	executed         bool
-	status           bool
+	tail     int
+	pending  bool
+	executed bool
+	status   bool
 }
 
 func (cmd *cmdQueryMultiSigTransactionList) Setup(params clingy.Parameters) {
 	cmd.caller.setup(params)
 	cmd.skipZeroConfirms = toggleFlag(params, "skip-zero-confirms", "If true, don't show transactions with zero confirmations.", true)
+	cmd.tail = optionalIntFlag(params, "tail", "If > 0, the maximum number of transactions to list, where the earlier transactions are skipped", 0)
 	cmd.pending = toggleFlag(params, "pending", "List pending transactions", true)
 	cmd.executed = toggleFlag(params, "executed", "List executed transactions", false)
 	cmd.status = !boolFlag(params, "short", "Only show transaction numbers")
@@ -35,6 +37,10 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 	}
 
 	needsSeparator := false
+
+	if cmd.tail > 0 && len(transactionIDs) > cmd.tail {
+		transactionIDs = transactionIDs[len(transactionIDs)-cmd.tail:]
+	}
 
 	for _, transactionID := range transactionIDs {
 		if cmd.skipZeroConfirms {
