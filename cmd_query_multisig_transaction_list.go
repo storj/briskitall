@@ -32,17 +32,29 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 		return err
 	}
 
-	for i, transactionID := range transactionIDs {
+	needsSeparator := false
+
+	for _, transactionID := range transactionIDs {
+		confirmations, err := caller.GetTransactionConfirmations(ctx, transactionID)
+		if err != nil {
+			return err
+		}
+		if len(confirmations) == 0 {
+			continue
+		}
+
 		if !cmd.status {
 			fmt.Fprintln(clingy.Stdout(ctx), transactionID)
 			continue
 		}
-		if i > 0 {
+
+		if needsSeparator {
 			fmt.Fprintln(clingy.Stdout(ctx))
 		}
 		if err := printTransactionStatus(ctx, caller, transactionID); err != nil {
 			return err
 		}
+		needsSeparator = true
 	}
 	return nil
 }
