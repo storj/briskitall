@@ -109,15 +109,17 @@ func confirmingSigner(ctx context.Context, nicknames multisig.Nicknames, signer 
 		in := clingy.Stdin(ctx)
 		out := clingy.Stdout(ctx)
 
-		call := tryDecodeCall(nicknames, tx.Data())
+		to := ""
+		decimals := 0
+		if txTo := tx.To(); txTo != nil {
+			to = nicknames.Lookup(*txTo)
+			decimals = knownDecimals[*txTo]
+		}
+		call := tryDecodeCall(nicknames, tx.Data(), decimals)
 
 		fmt.Fprintf(out, "Preparing to send transaction:\n")
 		fmt.Fprintf(out, "  Type...........: %s\n", txType(tx.Type()))
 		fmt.Fprintf(out, "  From...........: %s\n", nicknames.Lookup(sender))
-		to := ""
-		if txTo := tx.To(); txTo != nil {
-			to = nicknames.Lookup(*txTo)
-		}
 		fmt.Fprintf(out, "  To.............: %s\n", to)
 		switch {
 		case len(tx.Data()) == 0:

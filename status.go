@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"strings"
 	"sync"
 	"time"
 
@@ -20,6 +21,12 @@ import (
 var (
 	abis         []*abi.ABI
 	initABIsOnce sync.Once
+
+	ethereumDecimals = 18
+	knownDecimals    = map[common.Address]int{
+		// STORJ
+		common.HexToAddress("0xb64ef51c888972c908cfacf59b47c1afbc0ab8ac"): 8,
+	}
 )
 
 func initABIs() {
@@ -83,13 +90,13 @@ func printTransactionStatus(ctx context.Context, client eth.Client, nicknames mu
 		return blockTimestamps[blockNo], nil
 	}
 
-	call := tryDecodeCall(nicknames, tx.Data)
+	call := tryDecodeCall(nicknames, tx.Data, knownDecimals[tx.Destination])
 
 	fmt.Fprintf(out, "Transaction %d:\n", transactionID)
 	fmt.Fprintf(out, "  Destination = %s\n", nicknames.Lookup(tx.Destination))
 	switch {
 	case len(tx.Data) == 0:
-		fmt.Fprintf(out, "  Value       = %s\n", tx.Value)
+		fmt.Fprintf(out, "  Value       = %s\n", humanInt(tx.Value, ethereumDecimals))
 	case call != "":
 		fmt.Fprintf(out, "  Call        = %s\n", call)
 	default:
@@ -112,17 +119,17 @@ func printTransactionStatus(ctx context.Context, client eth.Client, nicknames mu
 	return nil
 }
 
-func tryDecodeCall(nicknames multisig.Nicknames, data []byte) string {
+func tryDecodeCall(nicknames multisig.Nicknames, data []byte, decimals int) string {
 	initABIs()
 	for _, a := range abis {
-		if decoded := tryDecodeABICall(nicknames, a, data); decoded != "" {
+		if decoded := tryDecodeABICall(nicknames, a, data, decimals); decoded != "" {
 			return decoded
 		}
 	}
 	return ""
 }
 
-func tryDecodeABICall(nicknames multisig.Nicknames, abi *abi.ABI, data []byte) string {
+func tryDecodeABICall(nicknames multisig.Nicknames, abi *abi.ABI, data []byte, decimals int) string {
 	if len(data) < 4 {
 		return ""
 	}
@@ -144,16 +151,19 @@ func tryDecodeABICall(nicknames multisig.Nicknames, abi *abi.ABI, data []byte) s
 				buf.WriteString(", ")
 			}
 			if argData, ok := arg.([]byte); ok {
-				if argCall := tryDecodeCall(nicknames, argData); argCall != "" {
+				if argCall := tryDecodeCall(nicknames, argData, decimals); argCall != "" {
 					fmt.Fprint(buf, argCall)
 				} else {
 					fmt.Fprintf(buf, "%x", arg)
 				}
 				continue
 			}
-			if argAddr, ok := arg.(common.Address); ok {
-				fmt.Fprint(buf, nicknames.Lookup(argAddr))
-			} else {
+			switch argT := arg.(type) {
+			case common.Address:
+				fmt.Fprint(buf, nicknames.Lookup(argT))
+			case *big.Int:
+				fmt.Fprint(buf, humanInt(argT, decimals))
+			default:
 				fmt.Fprint(buf, arg)
 			}
 		}
@@ -161,4 +171,53 @@ func tryDecodeABICall(nicknames multisig.Nicknames, abi *abi.ABI, data []byte) s
 		return buf.String()
 	}
 	return ""
+}
+
+// humanInt will turn v into a string representation of a base 10 integer
+// with US locale commas for thousands, millions, etc. if decimals is greater
+// than zero, this integer is assumed to be a decimal value, where the least
+// significant 'decimals' amount of digits are after a period.
+//
+// Examples:
+//
+//	humanInt(big.NewInt(1000), 0) -> "1,000"
+//	humanInt(big.NewInt(100000000), 4) -> "10,000.0000"
+func humanInt(v *big.Int, decimals int) string {
+	val := v.Text(10)
+	negative := val[0] == '-'
+	if negative {
+		val = val[1:]
+	}
+
+	if len(val) < decimals+1 {
+		val = strings.Repeat("0", decimals+1-len(val)) + val
+	}
+
+	out := make([]byte, len(val)+len(val)/3+2)
+	j := len(out) - 1
+
+	var i int
+	for i = 0; i < decimals; i++ {
+		out[j] = val[len(val)-1-i]
+		j--
+	}
+	if decimals > 0 {
+		out[j] = '.'
+		j--
+	}
+
+	for k := 0; i < len(val); i, k = i+1, k+1 {
+		if k%3 == 0 && k > 0 {
+			out[j] = ','
+			j--
+		}
+		out[j] = val[len(val)-1-i]
+		j--
+	}
+
+	result := string(bytes.Trim(out, "\x00"))
+	if negative {
+		return "-" + result
+	}
+	return result
 }
