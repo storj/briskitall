@@ -8,4 +8,5 @@ const (
 	envSenderKeyFile           = "BRISKITALL_SENDER_KEY_FILE"
 	envUSBWalletAccount        = "BRISKITALL_USB_WALLET_ACCOUNT"
 	envSkipConfirmation        = "BRISKITALL_SKIP_CONFIRMATION"
+	envAddressNicknames        = "BRISKITALL_ADDRESS_NICKNAMES"
 )

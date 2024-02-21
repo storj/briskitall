@@ -6,13 +6,28 @@ import (
 	"sort"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/errs"
 
 	"storj.io/briskitall/internal/contract"
 )
 
+type NicknameMap map[common.Address]string
+
+func (m NicknameMap) Lookup(wallet common.Address) string {
+	if entry, exists := m[wallet]; exists {
+		return entry
+	}
+	return wallet.String()
+}
+
+type Nicknames interface {
+	Lookup(wallet common.Address) (name string)
+}
+
 type Event interface {
 	String() string
+	StringWithNicknames(Nicknames) string
 
 	BlockNumber() uint64
 }
@@ -20,7 +35,11 @@ type Event interface {
 type confirmationEvent contract.MultiSigWalletConfirmation
 
 func (e *confirmationEvent) String() string {
-	return fmt.Sprintf("ETH[%s]: Confirmation(%s)", e.Raw.TxHash, e.Sender)
+	return e.StringWithNicknames(NicknameMap(nil))
+}
+
+func (e *confirmationEvent) StringWithNicknames(n Nicknames) string {
+	return fmt.Sprintf("ETH[%s]: Confirmation(%s)", e.Raw.TxHash, n.Lookup(e.Sender))
 }
 
 func (e *confirmationEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -28,7 +47,11 @@ func (e *confirmationEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 type revocationEvent contract.MultiSigWalletRevocation
 
 func (e *revocationEvent) String() string {
-	return fmt.Sprintf("ETH[%s]: Revocation(%s)", e.Raw.TxHash, e.Sender)
+	return e.StringWithNicknames(NicknameMap(nil))
+}
+
+func (e *revocationEvent) StringWithNicknames(n Nicknames) string {
+	return fmt.Sprintf("ETH[%s]: Revocation(%s)", e.Raw.TxHash, n.Lookup(e.Sender))
 }
 
 func (e *revocationEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -39,12 +62,20 @@ func (e *submissionEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Submission()", e.Raw.TxHash)
 }
 
+func (e *submissionEvent) StringWithNicknames(n Nicknames) string {
+	return e.String()
+}
+
 func (e *submissionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type executionEvent contract.MultiSigWalletExecution
 
 func (e *executionEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: Execution()", e.Raw.TxHash)
+}
+
+func (e *executionEvent) StringWithNicknames(n Nicknames) string {
+	return e.String()
 }
 
 func (e *executionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -55,12 +86,20 @@ func (e *executionFailureEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: ExecutionFailure()", e.Raw.TxHash)
 }
 
+func (e *executionFailureEvent) StringWithNicknames(n Nicknames) string {
+	return e.String()
+}
+
 func (e *executionFailureEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 
 type depositEvent contract.MultiSigWalletDeposit
 
 func (e *depositEvent) String() string {
-	return fmt.Sprintf("ETH[%s]: Deposit(%s, %s)", e.Raw.TxHash, e.Sender, e.Value)
+	return e.StringWithNicknames(NicknameMap(nil))
+}
+
+func (e *depositEvent) StringWithNicknames(n Nicknames) string {
+	return fmt.Sprintf("ETH[%s]: Deposit(%s, %s)", e.Raw.TxHash, n.Lookup(e.Sender), e.Value)
 }
 
 func (e *depositEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -68,7 +107,11 @@ func (e *depositEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 type ownerAdditionEvent contract.MultiSigWalletOwnerAddition
 
 func (e *ownerAdditionEvent) String() string {
-	return fmt.Sprintf("ETH[%s]: OwnerAddition(%s)", e.Raw.TxHash, e.Owner)
+	return e.StringWithNicknames(NicknameMap(nil))
+}
+
+func (e *ownerAdditionEvent) StringWithNicknames(n Nicknames) string {
+	return fmt.Sprintf("ETH[%s]: OwnerAddition(%s)", e.Raw.TxHash, n.Lookup(e.Owner))
 }
 
 func (e *ownerAdditionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -76,7 +119,11 @@ func (e *ownerAdditionEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
 type ownerRemovalEvent contract.MultiSigWalletOwnerRemoval
 
 func (e *ownerRemovalEvent) String() string {
-	return fmt.Sprintf("ETH[%s]: OwnerRemoval(%s)", e.Raw.TxHash, e.Owner)
+	return e.StringWithNicknames(NicknameMap(nil))
+}
+
+func (e *ownerRemovalEvent) StringWithNicknames(n Nicknames) string {
+	return fmt.Sprintf("ETH[%s]: OwnerRemoval(%s)", e.Raw.TxHash, n.Lookup(e.Owner))
 }
 
 func (e *ownerRemovalEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }
@@ -85,6 +132,10 @@ type requirementChangeEvent contract.MultiSigWalletRequirementChange
 
 func (e *requirementChangeEvent) String() string {
 	return fmt.Sprintf("ETH[%s]: RequirementChanged(%s)", e.Raw.TxHash, e.Required)
+}
+
+func (e *requirementChangeEvent) StringWithNicknames(n Nicknames) string {
+	return e.String()
 }
 
 func (e *requirementChangeEvent) BlockNumber() uint64 { return e.Raw.BlockNumber }

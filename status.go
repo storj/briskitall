@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
 
 	"storj.io/briskitall/internal/contract"
@@ -44,7 +45,7 @@ func initABIs() {
 	})
 }
 
-func printTransactionStatus(ctx context.Context, client eth.Client, caller *multisig.Caller, transactionID uint64) error {
+func printTransactionStatus(ctx context.Context, client eth.Client, nicknames multisig.Nicknames, caller *multisig.Caller, transactionID uint64) error {
 	out := clingy.Stdout(ctx)
 
 	tx, err := caller.FindTransaction(ctx, transactionID)
@@ -82,10 +83,10 @@ func printTransactionStatus(ctx context.Context, client eth.Client, caller *mult
 		return blockTimestamps[blockNo], nil
 	}
 
-	call := tryDecodeCall(tx.Data)
+	call := tryDecodeCall(nicknames, tx.Data)
 
 	fmt.Fprintf(out, "Transaction %d:\n", transactionID)
-	fmt.Fprintf(out, "  Destination = %s\n", tx.Destination)
+	fmt.Fprintf(out, "  Destination = %s\n", nicknames.Lookup(tx.Destination))
 	switch {
 	case len(tx.Data) == 0:
 		fmt.Fprintf(out, "  Value       = %s\n", tx.Value)
@@ -98,7 +99,7 @@ func printTransactionStatus(ctx context.Context, client eth.Client, caller *mult
 	fmt.Fprintf(out, "  Confirmed   = %t\n", confirmed)
 	fmt.Fprintf(out, "  Confirmations(%d):\n", len(confirmations))
 	for _, confirmation := range confirmations {
-		fmt.Fprintf(out, "    - Owner(%s)\n", confirmation)
+		fmt.Fprintf(out, "    - Owner(%s)\n", nicknames.Lookup(confirmation))
 	}
 	fmt.Fprintf(out, "  Events(%d):\n", len(events))
 	for _, event := range events {
@@ -106,22 +107,22 @@ func printTransactionStatus(ctx context.Context, client eth.Client, caller *mult
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(out, "    - %s: %s\n", ts.Format("2006-01-02"), event)
+		fmt.Fprintf(out, "    - %s: %s\n", ts.Format("2006-01-02"), event.StringWithNicknames(nicknames))
 	}
 	return nil
 }
 
-func tryDecodeCall(data []byte) string {
+func tryDecodeCall(nicknames multisig.Nicknames, data []byte) string {
 	initABIs()
 	for _, a := range abis {
-		if decoded := tryDecodeABICall(a, data); decoded != "" {
+		if decoded := tryDecodeABICall(nicknames, a, data); decoded != "" {
 			return decoded
 		}
 	}
 	return ""
 }
 
-func tryDecodeABICall(abi *abi.ABI, data []byte) string {
+func tryDecodeABICall(nicknames multisig.Nicknames, abi *abi.ABI, data []byte) string {
 	if len(data) < 4 {
 		return ""
 	}
@@ -143,14 +144,18 @@ func tryDecodeABICall(abi *abi.ABI, data []byte) string {
 				buf.WriteString(", ")
 			}
 			if argData, ok := arg.([]byte); ok {
-				if argCall := tryDecodeCall(argData); argCall != "" {
+				if argCall := tryDecodeCall(nicknames, argData); argCall != "" {
 					fmt.Fprint(buf, argCall)
 				} else {
 					fmt.Fprintf(buf, "%x", arg)
 				}
 				continue
 			}
-			fmt.Fprint(buf, arg)
+			if argAddr, ok := arg.(common.Address); ok {
+				fmt.Fprint(buf, nicknames.Lookup(argAddr))
+			} else {
+				fmt.Fprint(buf, arg)
+			}
 		}
 		buf.WriteString(")")
 		return buf.String()

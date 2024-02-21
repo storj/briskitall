@@ -21,5 +21,5 @@ func (cmd *cmdQueryMultiSigTransactionStatus) Execute(ctx context.Context) error
 	if err != nil {
 		return err
 	}
-	return printTransactionStatus(ctx, client, caller, cmd.transactionID)
+	return printTransactionStatus(ctx, client, cmd.caller.client.nicknames, caller, cmd.transactionID)
 }

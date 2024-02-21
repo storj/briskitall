@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zeebo/clingy"
 
 	"storj.io/briskitall/internal/eth"
+	"storj.io/briskitall/internal/multisig"
 )
 
 //lint:ignore U1000, utility func that is fine to be unused
@@ -115,6 +117,10 @@ func optionalDerivationPathFlag(params clingy.Parameters, name, desc string, def
 	return params.Flag(name, desc, def, clingy.Transform(accounts.ParseDerivationPath)).(accounts.DerivationPath)
 }
 
+func optionalNicknameMap(params clingy.Parameters, name, desc string, def multisig.NicknameMap, env string) multisig.NicknameMap {
+	return params.Flag(name, desc, def, clingy.Getenv(env), clingy.Transform(transformNicknameMap)).(multisig.NicknameMap)
+}
+
 func transformInt64(s string) (int64, error) {
 	return strconv.ParseInt(s, 10, 64)
 }
@@ -147,4 +153,23 @@ func transformBigInt(s string) (*big.Int, error) {
 		return nil, fmt.Errorf("not a valid big integer: %q", s)
 	}
 	return i, nil
+}
+
+func transformNicknameMap(s string) (multisig.NicknameMap, error) {
+	nicknames := multisig.NicknameMap{}
+	for _, definition := range strings.Split(s, ",") {
+		name, addrstring, found := strings.Cut(definition, ":")
+		if !found {
+			return nil, fmt.Errorf("invalid nickname map entry: %q", definition)
+		}
+		var address common.Address
+		if err := address.UnmarshalText([]byte(addrstring)); err != nil {
+			return nil, err
+		}
+		if _, exists := nicknames[address]; exists {
+			return nil, fmt.Errorf("nickname map entry defined twice: %s", address)
+		}
+		nicknames[address] = name
+	}
+	return nicknames, nil
 }
