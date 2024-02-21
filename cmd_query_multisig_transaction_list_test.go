@@ -50,16 +50,16 @@ func TestQueryMultiSigTransactionListCmd(t *testing.T) {
 		return requireCmdSuccess(t, harness, append(args, flags...)...)
 	}
 
-	assert.Empty(t, list("--pending=false", "--executed=false"))
-	assert.Empty(t, list("--pending=false", "--executed=true"))
-	assert.Equal(t, "0\n", list("--pending=true", "--executed=false"))
-	assert.Equal(t, expectedPending, list("--pending=true", "--executed=false", "--status"))
+	assert.Empty(t, list("--pending=false", "--executed=false", "--short"))
+	assert.Empty(t, list("--pending=false", "--executed=true", "--short"))
+	assert.Equal(t, "0\n", list("--pending=true", "--executed=false", "--short"))
+	assert.Equal(t, expectedPending, list("--pending=true", "--executed=false"))
 
 	// Now confirm the transaction and assert that it shows up under executed.
 	harness.MultiSig.ConfirmTransaction(t, test.AccountKey[1], transactionID)
 
-	assert.Empty(t, list("--pending=false", "--executed=false"))
-	assert.Empty(t, list("--pending=true", "--executed=false"))
-	assert.Equal(t, "0\n", list("--pending=false", "--executed=true"))
-	assert.Equal(t, expectedExecuted, list("--pending=false", "--executed=true", "--status"))
+	assert.Empty(t, list("--pending=false", "--executed=false", "--short"))
+	assert.Empty(t, list("--pending=true", "--executed=false", "--short"))
+	assert.Equal(t, "0\n", list("--pending=false", "--executed=true", "--short"))
+	assert.Equal(t, expectedExecuted, list("--pending=false", "--executed=true"))
 }

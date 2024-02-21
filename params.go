@@ -51,7 +51,7 @@ func repeatedAddressArg(params clingy.Parameters, name, desc string) []common.Ad
 }
 
 func toggleFlag(params clingy.Parameters, name, desc string, def bool) bool {
-	return params.Flag(name, desc, def, clingy.Transform(strconv.ParseBool)).(bool)
+	return params.Flag(name, desc, def, clingy.Transform(strconv.ParseBool), clingy.Boolean).(bool)
 }
 
 func boolFlag(params clingy.Parameters, name, desc string) bool {
