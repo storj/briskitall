@@ -25,7 +25,7 @@ func (cmd *cmdQueryMultiSigOwnerList) Execute(ctx context.Context) error {
 		return err
 	}
 	for _, address := range addresses {
-		fmt.Fprintln(clingy.Stdout(ctx), address)
+		fmt.Fprintln(clingy.Stdout(ctx), cmd.caller.client.nicknames.Lookup(address))
 	}
 	return nil
 }
