@@ -102,6 +102,10 @@ func optionalBigIntEnvFlag(params clingy.Parameters, name, desc string, def *big
 	return params.Flag(name, desc, def, clingy.Getenv(env), clingy.Transform(transformBigInt)).(*big.Int)
 }
 
+func optionalIntFlag(params clingy.Parameters, name, desc string, def int) int {
+	return params.Flag(name, desc, def, clingy.Transform(strconv.Atoi)).(int)
+}
+
 //lint:ignore U1000, utility func that is fine to be unused
 func requiredBigIntEnvFlag(params clingy.Parameters, name, desc string, env string) *big.Int {
 	return params.Flag(name, desc, clingy.Required, clingy.Getenv(env), clingy.Transform(transformBigInt)).(*big.Int)
