@@ -22,7 +22,7 @@ func (cmd *cmdQueryMultiSigTransactionList) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
-	caller, err := cmd.caller.open(ctx)
+	client, caller, err := cmd.caller.open(ctx)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (cmd *cmdQueryMultiSigTransactionList) Execute(ctx context.Context) error {
 		if needsSeparator {
 			fmt.Fprintln(clingy.Stdout(ctx))
 		}
-		if err := printTransactionStatus(ctx, caller, transactionID); err != nil {
+		if err := printTransactionStatus(ctx, client, caller, transactionID); err != nil {
 			return err
 		}
 		needsSeparator = true

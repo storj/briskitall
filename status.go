@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math/big"
 	"sync"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/zeebo/clingy"
 
 	"storj.io/briskitall/internal/contract"
+	"storj.io/briskitall/internal/eth"
 	"storj.io/briskitall/internal/multisig"
 )
 
@@ -41,7 +44,7 @@ func initABIs() {
 	})
 }
 
-func printTransactionStatus(ctx context.Context, caller *multisig.Caller, transactionID uint64) error {
+func printTransactionStatus(ctx context.Context, client eth.Client, caller *multisig.Caller, transactionID uint64) error {
 	out := clingy.Stdout(ctx)
 
 	tx, err := caller.FindTransaction(ctx, transactionID)
@@ -66,6 +69,19 @@ func printTransactionStatus(ctx context.Context, caller *multisig.Caller, transa
 		return err
 	}
 
+	blockTimestamps := map[uint64]time.Time{}
+	blockTimestamp := func(blockNo uint64) (time.Time, error) {
+		if ts, exists := blockTimestamps[blockNo]; exists {
+			return ts, nil
+		}
+		block, err := client.BlockByNumber(ctx, (&big.Int{}).SetUint64(blockNo))
+		if err != nil {
+			return time.Time{}, err
+		}
+		blockTimestamps[blockNo] = time.Unix(int64(block.Time()), 0)
+		return blockTimestamps[blockNo], nil
+	}
+
 	call := tryDecodeCall(tx.Data)
 
 	fmt.Fprintf(out, "Transaction %d:\n", transactionID)
@@ -86,7 +102,11 @@ func printTransactionStatus(ctx context.Context, caller *multisig.Caller, transa
 	}
 	fmt.Fprintf(out, "  Events(%d):\n", len(events))
 	for _, event := range events {
-		fmt.Fprintf(out, "    - %s\n", event)
+		ts, err := blockTimestamp(event.BlockNumber())
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "    - %s: %s\n", ts.Format("2006-01-02"), event)
 	}
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/zeebo/clingy"
 
+	"storj.io/briskitall/internal/eth"
 	"storj.io/briskitall/internal/multisig"
 )
 
@@ -18,10 +19,14 @@ func (dep *depMultiSigCaller) setup(params clingy.Parameters) {
 	dep.multiSig.setup(params)
 }
 
-func (dep *depMultiSigCaller) open(ctx context.Context) (*multisig.Caller, error) {
+func (dep *depMultiSigCaller) open(ctx context.Context) (eth.Client, *multisig.Caller, error) {
 	client, err := dep.client.open(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return multisig.NewCaller(client, dep.multiSig.contractAddress)
+	caller, err := multisig.NewCaller(client, dep.multiSig.contractAddress)
+	if err != nil {
+		return nil, nil, err
+	}
+	return client, caller, nil
 }

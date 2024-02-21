@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeebo/errs"
 )
@@ -18,6 +19,7 @@ type Client interface {
 	ethereum.ChainStateReader
 
 	ChainID(ctx context.Context) (*big.Int, error)
+	BlockByNumber(context.Context, *big.Int) (*types.Block, error)
 	Close()
 }
 

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -9,7 +11,9 @@ import (
 )
 
 func TestQueryMultiSigTransactionListCmd(t *testing.T) {
-	const expectedPending = `Transaction 0:
+	today := time.Now().Format("2006-01-02")
+
+	expectedPending := fmt.Sprintf(`Transaction 0:
   Destination = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
   Call        = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
   Executed    = false
@@ -17,10 +21,11 @@ func TestQueryMultiSigTransactionListCmd(t *testing.T) {
   Confirmations(1):
     - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
   Events(2):
-    - ETH[0]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
-    - ETH[0]: Submission()
-`
-	const expectedExecuted = `Transaction 0:
+    - %s: ETH[0]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - %s: ETH[0]: Submission()
+`, today, today)
+
+	expectedExecuted := fmt.Sprintf(`Transaction 0:
   Destination = 0x7A35a1584FDD8c88B0Fe60f21199CF6eEeCAA0fe
   Call        = addOwner(0xD370Bbc286487CD41E18c3561c0Fc9C1a986516B)
   Executed    = true
@@ -29,11 +34,11 @@ func TestQueryMultiSigTransactionListCmd(t *testing.T) {
     - Owner(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
     - Owner(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
   Events(4):
-    - ETH[0]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
-    - ETH[0]: Submission()
-    - ETH[1]: Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
-    - ETH[1]: Execution()
-`
+    - %s: ETH[0]: Confirmation(0x46f40B6B0dFDa35A8b6247489669a83c69804F3a)
+    - %s: ETH[0]: Submission()
+    - %s: ETH[1]: Confirmation(0xBA4e70c2dc335aa86c6BF55F80d631Cf846435F0)
+    - %s: ETH[1]: Execution()
+`, today, today, today, today)
 
 	harness := test.Run(t)
 

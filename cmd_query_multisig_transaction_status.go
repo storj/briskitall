@@ -17,9 +17,9 @@ func (cmd *cmdQueryMultiSigTransactionStatus) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdQueryMultiSigTransactionStatus) Execute(ctx context.Context) error {
-	caller, err := cmd.caller.open(ctx)
+	client, caller, err := cmd.caller.open(ctx)
 	if err != nil {
 		return err
 	}
-	return printTransactionStatus(ctx, caller, cmd.transactionID)
+	return printTransactionStatus(ctx, client, caller, cmd.transactionID)
 }

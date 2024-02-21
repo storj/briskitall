@@ -16,7 +16,7 @@ func (cmd *cmdQueryMultiSigRequirement) Setup(params clingy.Parameters) {
 }
 
 func (cmd *cmdQueryMultiSigRequirement) Execute(ctx context.Context) error {
-	caller, err := cmd.caller.open(ctx)
+	_, caller, err := cmd.caller.open(ctx)
 	if err != nil {
 		return err
 	}
