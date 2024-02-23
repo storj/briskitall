@@ -16,7 +16,7 @@ type NicknameMap map[common.Address]string
 
 func (m NicknameMap) Lookup(wallet common.Address) string {
 	if entry, exists := m[wallet]; exists {
-		return entry
+		return entry + ":" + wallet.String()
 	}
 	return wallet.String()
 }
