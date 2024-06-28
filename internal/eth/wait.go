@@ -11,6 +11,12 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
+const (
+	// notDroppedUntil is how long to wait for a transaction
+	// before considering it dropped.
+	notDroppedUntil = time.Second * 30
+)
+
 type WaitProgress interface {
 	Start(hash common.Hash)
 	Canceled()
@@ -64,6 +70,8 @@ func (w progressWaiter) Wait(ctx context.Context, hash common.Hash) (uint64, err
 }
 
 func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Hash, progress WaitProgress) (uint64, error) {
+	startTime := time.Now()
+
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -71,6 +79,7 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 		progress = NoProgress{}
 	}
 	progress.Start(hash)
+
 	for {
 		select {
 		case <-time.After(time.Millisecond * 100):
@@ -98,8 +107,13 @@ func WaitForTransaction(ctx context.Context, backend WaitBackend, hash common.Ha
 		switch {
 		case err == nil:
 		case err == ethereum.NotFound:
-			progress.Dropped()
-			return 0, errors.New("transaction dropped")
+			// Wait up to notDroppedUntil time before considering the
+			// transaction dropped. This avoids false positives when using
+			// networks like Infura, whose nodes are eventually consistent.
+			if time.Since(startTime) >= notDroppedUntil {
+				progress.Dropped()
+				return 0, errors.New("transaction dropped")
+			}
 		default:
 			progress.TempError(fmt.Errorf("failed to query for transaction by hash: %+v", err))
 		}
